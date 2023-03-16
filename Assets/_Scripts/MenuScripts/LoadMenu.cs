@@ -16,23 +16,16 @@ public class LoadMenu : MonoBehaviour
 
     private GameManager gameManager;
     private AnimationManager animManager;
-    private MainMenu mainMenu;
 
     private List<string> loadableAnims = new List<string>();
 
     private GameObject DeleteAnim;
     private TMP_Dropdown ddLoadAnims;
 
-    private MainMenuItem createAnimMenu;
-
     private void Awake()
     {
         DeleteAnim = GameObject.Find("DeleteConfirmation");
         ddLoadAnims = GameObject.Find("LoadableAnimsDD").GetComponent<TMP_Dropdown>();
-
-        createAnimMenu = GameObject.Find("CreateAnimMenu").GetComponent<MainMenuItem>();
-
-        mainMenu = GetComponent<MainMenu>();
     }
 
     private void Start()
@@ -96,7 +89,10 @@ public class LoadMenu : MonoBehaviour
 
     public void LoadAnimation()
     {
-        animManager.LoadAnimation(gameManager.currentAnimation);
+        if (!animManager.LoadAnimation(gameManager.currentAnimation))
+        {
+            return;
+        }
 
         SceneManager.LoadScene(editorSceneName);
     }

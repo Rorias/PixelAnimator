@@ -97,7 +97,7 @@ public class CreateMenu : MonoBehaviour
         {
             for (int part = 0; part < gameManager.currentAnimation.maxPartCount; part++)
             {
-                gameManager.currentAnimation.frames[i].frameParts.Add(new Part() { partID = part });
+                gameManager.currentAnimation.frames[i].frameParts.Add(new Part() { partID = part, partIndex = -1 });
             }
         }
     }

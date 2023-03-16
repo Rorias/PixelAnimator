@@ -2,8 +2,9 @@ using System;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
+using TMPro;
+
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Part
 {
@@ -49,6 +50,7 @@ public class Part
 
         return xpart;
     }
+
     public void Load(XElement _model)
     {
         if (_model.FirstAttribute != null)
@@ -109,16 +111,6 @@ public class Part
         {
             Debug.Log("FlipY does not exist. Set to false.");
             flipY = false;
-        }
-
-        if (partIndex != -1)
-        {
-            if (partIndex > GameObject.Find("Sprites").GetComponent<Dropdown>().options.Count - 1)
-            {
-                partIndex = 0;
-            }
-
-            part = GameObject.Find("Sprites").GetComponent<Dropdown>().options[partIndex].image;
         }
     }
 }

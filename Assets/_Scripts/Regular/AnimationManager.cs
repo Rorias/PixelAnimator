@@ -38,6 +38,19 @@ public sealed class AnimationManager
     private XDocument model;
     private XElement XModel;
 
+    public void SaveFile(Animation _anim)
+    {
+        animation = _anim;
+        SaveAnimationXMLFile(Application.dataPath + "/StreamingAssets/" + _anim.animationName);
+    }
+
+    private void SaveAnimationXMLFile(string _path)
+    {
+        XModel = animation.Save();
+        model = XDocument.Parse(XModel.ToString());
+        model.Save(_path + ".xml");
+    }
+
     public bool LoadAnimation(Animation _a)
     {
         animation = _a;

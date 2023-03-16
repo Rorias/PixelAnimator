@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
 
     private void LoadGameSettings()
     {
-        fullScreen = Convert.ToBoolean(ini.Read(SfullScreen, "True"));
+        fullScreen = Convert.ToBoolean(ini.Read(SfullScreen, "False"));
         resNumber = Convert.ToInt32(ini.Read(SresNumber, "1"));
 
         spritesetsPath = ini.Read(SspritesetsPath, "");
@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < resolutions.Length; i++)
         {
-            if ((resolutions[i].height % 9 == 0 || resolutions[i].height % 10 == 0) && resolutions[i].refreshRate == 59)
+            if ((resolutions[i].height % 9 == 0) && (resolutions[i].refreshRate == 59 || resolutions[i].refreshRate == 60 || resolutions[i].refreshRate == 75))
             {
                 acceptedResNumbers.Add(i);
             }

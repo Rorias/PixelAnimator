@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
-
-using UnityEngine;
 
 
 public sealed class AnimationManager
@@ -33,6 +29,8 @@ public sealed class AnimationManager
     }
     #endregion
 
+    private GameManager gameManager = GameManager.Instance;
+
     private Animation animation = null;
 
     private XDocument model;
@@ -41,7 +39,7 @@ public sealed class AnimationManager
     public void SaveFile(Animation _anim)
     {
         animation = _anim;
-        SaveAnimationXMLFile(Application.dataPath + "/StreamingAssets/" + _anim.animationName);
+        SaveAnimationXMLFile(gameManager.animationsPath + _anim.animationName);
     }
 
     private void SaveAnimationXMLFile(string _path)
@@ -55,9 +53,9 @@ public sealed class AnimationManager
     {
         animation = _a;
 
-        if (File.Exists(Application.dataPath + "/StreamingAssets/" + _a.animationName + ".xml"))
+        if (File.Exists(gameManager.animationsPath + _a.animationName + ".xml"))
         {
-            model = XDocument.Load(Application.dataPath + "/StreamingAssets/" + _a.animationName + ".xml");
+            model = XDocument.Load(gameManager.animationsPath + _a.animationName + ".xml");
             XModel = model.Root;
             if (!_a.Load(XModel))
             {

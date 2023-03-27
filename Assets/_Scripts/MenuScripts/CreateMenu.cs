@@ -53,6 +53,7 @@ public class CreateMenu : MonoBehaviour
         if (string.IsNullOrWhiteSpace(IFName.text))
         {
             Debug.Log("Please give your animation a name.");
+            DebugHelper.Log("Please give your animation a name.");
             return false;
         }
 
@@ -107,6 +108,7 @@ public class CreateMenu : MonoBehaviour
         if (File.Exists(Application.dataPath + "/StreamingAssets/" + gameManager.currentAnimation.animationName + ".xml"))
         {
             Debug.Log("There is already an animation with this name.");
+            DebugHelper.Log("There is already an animation with this name.");
             return;
         }
 

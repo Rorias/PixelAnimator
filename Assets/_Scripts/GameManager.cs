@@ -52,6 +52,8 @@ public class GameManager : MonoBehaviour
 
     [HideInInspector] public string spritesetsPath = "";
     [HideInInspector] public string currentSpriteset = "";
+
+    [HideInInspector] public string animationsPath = "";
     #endregion
 
     #region const strings
@@ -60,6 +62,8 @@ public class GameManager : MonoBehaviour
 
     public const string SspritesetsPath = "spritesetsPath";
     public const string ScurrentSpriteset = "currentSpriteset";
+
+    public const string SanimationsPath = "animationsPath";
     #endregion
 
     private void LoadGameSettings()
@@ -69,6 +73,8 @@ public class GameManager : MonoBehaviour
 
         spritesetsPath = ini.Read(SspritesetsPath, "");
         currentSpriteset = ini.Read(ScurrentSpriteset, "");
+
+        animationsPath = ini.Read(SanimationsPath, Application.dataPath + "/StreamingAssets/");
     }
 
     public void SetGameSettings()
@@ -103,6 +109,8 @@ public class GameManager : MonoBehaviour
 
         ini.Write(SspritesetsPath, spritesetsPath);
         ini.Write(ScurrentSpriteset, currentSpriteset);
+
+        ini.Write(SanimationsPath, animationsPath);
     }
 
     public float ParseToSingle(string parseValue)

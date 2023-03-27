@@ -52,18 +52,9 @@ public class Frame
 
         foreach (XElement xpart in xparts.XPathSelectElements("./Part"))
         {
-            int partID;
+            int partID = Convert.ToInt32(xpart.FirstAttribute.Value);
 
-            if (xpart.FirstAttribute != null)
-            {
-                partID = Convert.ToInt32(xpart.FirstAttribute.Value);
-            }
-            else
-            {
-                partID = Convert.ToInt32(xpart.XPathSelectElement("./" + Part.xPartID).Value);
-            }
-
-            Part part = frameParts.Find(x => (x == null) ? true : x.partID == partID);
+            Part part = frameParts.Find(x => x.partID == partID);
 
             if (part == null)
             {

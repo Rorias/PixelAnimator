@@ -47,6 +47,7 @@ public class LoadMenu : MonoBehaviour
         if (loadableAnims.Count <= 0)
         {
             Debug.Log("No loadable animations were found. Please create a new one instead.");
+            DebugHelper.Log("No loadable animations were found. Please create a new one instead.");
             return;
         }
 
@@ -58,7 +59,7 @@ public class LoadMenu : MonoBehaviour
 
     private void GetLoadableAnimations()
     {
-        string[] fileNames = Directory.GetFiles(Application.dataPath + "/StreamingAssets/", "*.xml");
+        string[] fileNames = Directory.GetFiles(gameManager.animationsPath, "*.xml");
 
         if (loadableAnims.Count > 0) { loadableAnims.Clear(); }
 

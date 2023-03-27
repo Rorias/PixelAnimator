@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,120 +7,53 @@ using System.Linq;
 using TMPro;
 
 using UnityEngine;
-using UnityEngine.UI;
 
-public class SettingsMenu : MonoBehaviour
+public class InitialisationMenu : MonoBehaviour
 {
-    public static readonly List<string> imageTypes = new List<string> { ".jpg", ".jpeg", ".png" };
+    public MainMenuItem startMenu;
 
-    private GameManager gameManager;
-
-    //Settings UI elements
-    //Personal
     private TMP_InputField spritesetPathIF;
     private TMP_Dropdown currentSpritesetDD;
 
-    private TMP_InputField animationsPathIF;
-    //Editor
-    public TMP_Dropdown resDD;
+    private MainMenu mainMenu;
+    private GameManager gameManager;
 
     private void Awake()
     {
-        spritesetPathIF = GameObject.Find("SpritesetPath").GetComponent<TMP_InputField>();
+        spritesetPathIF = GameObject.Find("InitSpritesetPath").GetComponent<TMP_InputField>();
         spritesetPathIF.onValueChanged.AddListener(delegate { SetSpritesetPathViaBrowse(); });
         spritesetPathIF.onEndEdit.AddListener(delegate { SetSpritesetPath(); });
 
-        currentSpritesetDD = GameObject.Find("SpritesetDD").GetComponent<TMP_Dropdown>();
+        currentSpritesetDD = GameObject.Find("InitSpritesetDD").GetComponent<TMP_Dropdown>();
         currentSpritesetDD.onValueChanged.AddListener(delegate { SetCurrentSpriteset(); });
-
-        animationsPathIF = GameObject.Find("AnimationsPath").GetComponent<TMP_InputField>();
-        animationsPathIF.onValueChanged.AddListener(delegate { SetAnimationsPathViaBrowse(); });
-        animationsPathIF.onEndEdit.AddListener(delegate { SetAnimationsPath(); });
     }
 
     private void Start()
     {
+        mainMenu = GetComponent<MainMenu>();
         gameManager = GameManager.Instance;
+        spritesetPathIF.text = gameManager.spritesetsPath;
     }
 
-    public void InitializeSettingsMenu()
+    public void ApplySettings()
     {
-        LoadSpritesetSettings();
-        LoadAnimationsSettings();
-        LoadResSettings();
-    }
-
-    private void LoadSpritesetSettings()
-    {
-        if (!string.IsNullOrWhiteSpace(gameManager.spritesetsPath))
+        if (string.IsNullOrWhiteSpace(gameManager.spritesetsPath) || !Directory.Exists(gameManager.spritesetsPath))
         {
-            if (Directory.Exists(gameManager.spritesetsPath))
-            {
-                spritesetPathIF.text = gameManager.spritesetsPath;
-                currentSpritesetDD.value = currentSpritesetDD.options.FindIndex(x => x.text == gameManager.currentSpriteset);
-            }
-            else
-            {
-                Debug.Log("Spriteset path doesn't exist or has been changed.");
-                DebugHelper.Log("Spriteset path doesn't exist or has been changed.");
-            }
-        }
-    }
-
-    private void LoadAnimationsSettings()
-    {
-        if (!string.IsNullOrWhiteSpace(gameManager.animationsPath))
-        {
-            if (Directory.Exists(gameManager.animationsPath))
-            {
-                animationsPathIF.text = gameManager.animationsPath;
-            }
-            else
-            {
-                Debug.Log("Animations path doesn't exist or has been changed.");
-                DebugHelper.Log("Animations path doesn't exist or has been changed.");
-            }
-        }
-    }
-
-    public void LoadResSettings()
-    {
-        resDD.ClearOptions();
-
-        Resolution[] resolutions = Screen.resolutions;
-
-        List<string> resOptions = new List<string>();
-
-        foreach (Resolution res in resolutions)
-        {
-            if ((res.height % 9 == 0) && (res.refreshRate == 59 || res.refreshRate == 60 || res.refreshRate == 75))
-            {
-                resOptions.Add(res.width + "x" + res.height + " : " + res.refreshRate);
-            }
+            Debug.Log("No spriteset path has been selected, or the selected path is not valid.");
+            DebugHelper.Log("No spriteset path has been selected, or the selected path is not valid.");
+            return;
         }
 
-        resDD.AddOptions(resOptions);
-
-        for (int i = 0; i < resOptions.Count; i++)
+        if (gameManager.currentSpriteset == "")
         {
-            resDD.options[i].text = resOptions[i];
+            Debug.Log("No spriteset has been selected from the list.");
+            DebugHelper.Log("No spriteset has been selected from the list.");
+            return;
         }
 
-        resDD.value = gameManager.resNumber;
-
-        gameManager.SaveGameSettings();
-        gameManager.SetGameSettings();
+        mainMenu.ActivateNextMenu(startMenu);
     }
 
-    public void SetResolution()
-    {
-        gameManager.resNumber = resDD.value;
-
-        gameManager.SaveGameSettings();
-        gameManager.SetGameSettings();
-    }
-
-    #region Spriteset settings
     public void SetSpritesetPathViaBrowse()
     {
         string spritesetPath = spritesetPathIF.text;
@@ -200,7 +134,7 @@ public class SettingsMenu : MonoBehaviour
                     continue;
                 }
 
-                if (!imageTypes.Contains(Path.GetExtension(f).ToLowerInvariant()))
+                if (!SettingsMenu.imageTypes.Contains(Path.GetExtension(f).ToLowerInvariant()))
                 {
                     unacceptedTypes = true;
                     break;
@@ -241,7 +175,7 @@ public class SettingsMenu : MonoBehaviour
                         if (folder.Substring(folder.LastIndexOf('\\') + 1) == gameManager.currentSpriteset)
                         {
                             string[] files = Directory.GetFiles(folder, "*.*", SearchOption.TopDirectoryOnly)
-                                                      .Where(s => s.EndsWith(imageTypes[0]) || s.EndsWith(imageTypes[1]) || s.EndsWith(imageTypes[2])).ToArray();
+                                                      .Where(s => s.EndsWith(SettingsMenu.imageTypes[0]) || s.EndsWith(SettingsMenu.imageTypes[1]) || s.EndsWith(SettingsMenu.imageTypes[2])).ToArray();
 
                             ImportImagesAsSprites(files);
                             break;
@@ -266,7 +200,7 @@ public class SettingsMenu : MonoBehaviour
 
             string spriteName = _images[i];
 
-            if (spriteName.Contains(imageTypes[0]) || spriteName.Contains(imageTypes[1]) || spriteName.Contains(imageTypes[2]))
+            if (spriteName.Contains(SettingsMenu.imageTypes[0]) || spriteName.Contains(SettingsMenu.imageTypes[1]) || spriteName.Contains(SettingsMenu.imageTypes[2]))
             {
                 spriteName = _images[i].Remove(_images[i].Length - 4);
             }
@@ -276,40 +210,4 @@ public class SettingsMenu : MonoBehaviour
             gameManager.spritesetImages.Add(i, newSprite);
         }
     }
-    #endregion
-
-    #region Animations settings
-    public void SetAnimationsPathViaBrowse()
-    {
-        string animationsPath = animationsPathIF.text;
-
-        if (!string.IsNullOrWhiteSpace(animationsPath))
-        {
-            if (Directory.Exists(animationsPath))
-            {
-                gameManager.animationsPath = animationsPath;
-                gameManager.SaveGameSettings();
-            }
-        }
-    }
-
-    public void SetAnimationsPath()
-    {
-        string animationsPath = animationsPathIF.text;
-
-        if (!string.IsNullOrWhiteSpace(animationsPath))
-        {
-            if (Directory.Exists(animationsPath))
-            {
-                gameManager.animationsPath = animationsPath;
-                gameManager.SaveGameSettings();
-            }
-            else
-            {
-                Debug.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
-                DebugHelper.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
-            }
-        }
-    }
-    #endregion
 }

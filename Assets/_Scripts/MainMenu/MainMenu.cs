@@ -24,16 +24,32 @@ public class MainMenu : MonoBehaviour
             menus[i].gameObject.SetActive(false);
         }
 
-        currentMenu = mainMenu;
-        mainMenu.gameObject.SetActive(true);
+        if (mainMenu != null)
+        {
+            currentMenu = mainMenu;
+            mainMenu.gameObject.SetActive(true);
+        }
     }
 
-    public void ActivateNextMenu(MainMenuItem nextMenu)
+    public void ActivateNextMenu(MainMenuItem _nextMenu)
     {
-        nextMenu.previousItem = currentMenu;
-        currentMenu.gameObject.SetActive(false);
-        currentMenu = nextMenu;
-        currentMenu.gameObject.SetActive(true);
+        if (currentMenu == _nextMenu && !_nextMenu.gameObject.activeSelf && _nextMenu.previousItem == _nextMenu)
+        {
+            currentMenu.gameObject.SetActive(true);
+            return;
+        }
+
+        if (currentMenu != null)
+        {
+            _nextMenu.previousItem = currentMenu;
+            currentMenu.gameObject.SetActive(false);
+        }
+
+        if (currentMenu != _nextMenu)
+        {
+            currentMenu = _nextMenu;
+            currentMenu.gameObject.SetActive(true);
+        }
     }
 
     public void Back()

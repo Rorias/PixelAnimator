@@ -146,7 +146,7 @@ public class PixelAnimator : MonoBehaviour
             BackConfirmation.SetActive(false);
         }
 
-        playbackSpeed = EditorSettings.lastPlaybackspeed;
+        playbackSpeed = gameManager.lastPlaybackSpeed;
         playbackSpeedWFS = new WaitForSeconds(playbackSpeed);
         GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(playbackSpeed);
     }
@@ -471,10 +471,12 @@ public class PixelAnimator : MonoBehaviour
         {
             Debug.Log("Playback speed cannot be lower than 0.001. Auto-set to 0.001.");
             playbackSpeed = 0.001f;
+            GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(playbackSpeed);
         }
 
-        EditorSettings.SetLastPlayspeed(playbackSpeed);
         playbackSpeedWFS = new WaitForSeconds(playbackSpeed);
+        gameManager.lastPlaybackSpeed = playbackSpeed;
+        gameManager.SaveGameSettings();
     }
     #endregion
 

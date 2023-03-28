@@ -54,6 +54,8 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public string currentSpriteset = "";
 
     [HideInInspector] public string animationsPath = "";
+
+    [HideInInspector] public float lastPlaybackSpeed = 0.0f;
     #endregion
 
     #region const strings
@@ -64,6 +66,8 @@ public class GameManager : MonoBehaviour
     public const string ScurrentSpriteset = "currentSpriteset";
 
     public const string SanimationsPath = "animationsPath";
+
+    public const string SlastPlaybackSpeed = "lastPlaybackSpeed";
     #endregion
 
     private void LoadGameSettings()
@@ -75,6 +79,8 @@ public class GameManager : MonoBehaviour
         currentSpriteset = ini.Read(ScurrentSpriteset, "");
 
         animationsPath = ini.Read(SanimationsPath, Application.dataPath + "/StreamingAssets/");
+
+        lastPlaybackSpeed = ParseToSingle(ini.Read(SlastPlaybackSpeed, "0"));
     }
 
     public void SetGameSettings()
@@ -111,6 +117,8 @@ public class GameManager : MonoBehaviour
         ini.Write(ScurrentSpriteset, currentSpriteset);
 
         ini.Write(SanimationsPath, animationsPath);
+
+        ini.Write(SlastPlaybackSpeed, ParseToString(lastPlaybackSpeed));
     }
 
     public float ParseToSingle(string parseValue)

@@ -66,6 +66,13 @@ public class LoadMenu : MonoBehaviour
         foreach (string s in fileNames)
         {
             string animName = s.Substring(s.LastIndexOf('/') + 1);
+
+            //Check in case / = \\
+            if (animName.Length == s.Length)
+            {
+                animName = s.Substring(s.LastIndexOf('\\') + 1);
+            }
+
             animName = animName.Split('.')[0];
             loadableAnims.Add(animName);
         }

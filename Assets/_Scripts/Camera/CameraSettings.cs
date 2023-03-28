@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 
 using TMPro;
 
@@ -9,8 +7,8 @@ using UnityEngine.Events;
 
 public class CameraSettings : MonoBehaviour
 {
-    [HideInInspector] public float maxCameraZoom = 15f;
-    [HideInInspector] public float cameraSpeed = 0.5f;
+    [NonSerialized] public float maxCameraZoom = 15f;
+    [NonSerialized] public float cameraSpeed = 0.2f;
 
     private TMP_InputField CameraZoomIF;
     private TMP_InputField CameraSpeedIF;
@@ -53,7 +51,7 @@ public class CameraSettings : MonoBehaviour
     public void SetCameraSpeed()
     {
         float camSpeed = gameManager.ParseToSingle(CameraSpeedIF.text);
-        camSpeed = Mathf.Min(Mathf.Max(camSpeed, 0.1f), 5);
+        camSpeed = Mathf.Min(Mathf.Max(camSpeed, 0.025f), 5);
 
         cameraSpeed = camSpeed;
         CameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
@@ -68,7 +66,7 @@ public class CameraSettings : MonoBehaviour
 
     public void ResetCameraSpeed()
     {
-        cameraSpeed = 0.5f;
+        cameraSpeed = 0.2f;
         CameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
     }
 

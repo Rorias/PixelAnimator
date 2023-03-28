@@ -40,22 +40,22 @@ public class GameManager : MonoBehaviour
 
     private static readonly CultureInfo CultUS = new CultureInfo("en-US");
 
-    [HideInInspector] public Dictionary<int, Sprite> spritesetImages = new Dictionary<int, Sprite>();
+    [NonSerialized] public Dictionary<int, Sprite> spritesetImages = new Dictionary<int, Sprite>();
     [HideInInspector] public IniFile ini { get; private set; }
 
-    [HideInInspector] public Animation currentAnimation = null;
+    [NonSerialized] public Animation currentAnimation = null;
 
     //Settings that affect the entire program
     #region GameSettings 
-    [HideInInspector] public bool fullScreen = true;
-    [HideInInspector] public int resNumber = 1;
+    [NonSerialized] public bool fullScreen = true;
+    [NonSerialized] public int resNumber = 1;
 
-    [HideInInspector] public string spritesetsPath = "";
-    [HideInInspector] public string currentSpriteset = "";
+    [NonSerialized] public string spritesetsPath = "";
+    [NonSerialized] public string currentSpriteset = "";
 
-    [HideInInspector] public string animationsPath = "";
+    [NonSerialized] public string animationsPath = "";
 
-    [HideInInspector] public float lastPlaybackSpeed = 0.0f;
+    [NonSerialized] public float lastPlaybackSpeed = 0.0f;
     #endregion
 
     #region const strings

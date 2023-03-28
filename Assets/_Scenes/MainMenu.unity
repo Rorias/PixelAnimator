@@ -3279,7 +3279,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33aad7ceb920a61478889f8aee273e40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previousItem: {fileID: 0}
 --- !u!1 &361071668
 GameObject:
   m_ObjectHideFlags: 0
@@ -7591,7 +7590,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33aad7ceb920a61478889f8aee273e40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previousItem: {fileID: 0}
 --- !u!224 &862691036
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10203,7 +10201,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33aad7ceb920a61478889f8aee273e40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previousItem: {fileID: 0}
 --- !u!1 &1353653645
 GameObject:
   m_ObjectHideFlags: 0
@@ -11643,7 +11640,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33aad7ceb920a61478889f8aee273e40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previousItem: {fileID: 0}
 --- !u!1 &1513274486
 GameObject:
   m_ObjectHideFlags: 0
@@ -13903,7 +13899,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33aad7ceb920a61478889f8aee273e40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  previousItem: {fileID: 0}
 --- !u!1 &1737245705
 GameObject:
   m_ObjectHideFlags: 0
@@ -14898,11 +14893,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d24eba5f186f9641862c8aba3fbe229, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fullScreen: 1
-  resNumber: 1
-  spritesetsPath: 
-  currentSpriteset: 
-  animationsPath: 
 --- !u!4 &1889484169
 Transform:
   m_ObjectHideFlags: 0

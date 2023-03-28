@@ -28,6 +28,7 @@ public class PixelAnimator : MonoBehaviour
 
     private GameObject currentGamePart;
     private SpriteRenderer currentGamePartSR;
+    private Animator currentGamePartAnimator;
 
     private Dictionary<int, Sprite> possibleSprites = new Dictionary<int, Sprite>();
 
@@ -35,7 +36,7 @@ public class PixelAnimator : MonoBehaviour
     private TMP_InputField XPosIF;
     private TMP_InputField YPosIF;
 
-    [HideInInspector] public Slider partSelect;
+    [NonSerialized] public Slider partSelect;
     private TMP_Text partSelectText;
     private Slider frameSelect;
     private TMP_Text frameSelectText;
@@ -58,8 +59,11 @@ public class PixelAnimator : MonoBehaviour
 
     private float lastOpenedPositionDD = 0f;
     private float playbackSpeed = 0.02f;
+
     private bool playingAnimation = false;
     private bool dropdownActive = false;
+    private bool copyToNextFrame = true;
+    private bool copyToNextFrameWasOn = false;
 
     private void Awake()
     {
@@ -135,6 +139,7 @@ public class PixelAnimator : MonoBehaviour
         currentPart = currentFrame.frameParts[0];
         currentGamePart = GameParts[0];
         currentGamePartSR = currentGamePart.GetComponent<SpriteRenderer>();
+        currentGamePartAnimator = currentGamePart.GetComponent<Animator>();
 
         if (gameManager.currentSpriteset != gameManager.currentAnimation.usedSpriteset)
         {
@@ -146,9 +151,8 @@ public class PixelAnimator : MonoBehaviour
             BackConfirmation.SetActive(false);
         }
 
-        playbackSpeed = gameManager.lastPlaybackSpeed;
-        playbackSpeedWFS = new WaitForSeconds(playbackSpeed);
-        GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(playbackSpeed);
+        GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(gameManager.lastPlaybackSpeed);
+        SetPlaybackSpeed();
     }
 
     private void Update()
@@ -361,6 +365,11 @@ public class PixelAnimator : MonoBehaviour
         {
             playingAnimation = true;
 
+            currentGamePartAnimator.SetBool("WasSelected", false);
+
+            if (copyToNextFrame) { copyToNextFrameWasOn = true; copyToNextFrame = false; }
+            else { copyToNextFrameWasOn = false; }
+
             for (int i = 0; i < GameParts.Count; i++)
             {
                 if (GameParts[i].GetComponent<PolygonCollider2D>() != null)
@@ -378,6 +387,8 @@ public class PixelAnimator : MonoBehaviour
         else
         {
             playingAnimation = false;
+
+            if (copyToNextFrameWasOn) { copyToNextFrame = true; }
 
             for (int i = 0; i < GameParts.Count; i++)
             {
@@ -429,6 +440,18 @@ public class PixelAnimator : MonoBehaviour
             currentFrame.frameParts[i].flipX = GamePartsSRs[i].flipX;
             currentFrame.frameParts[i].flipY = GamePartsSRs[i].flipY;
 
+            if (copyToNextFrame && frameSelect.value > currentFrame.frameID &&
+                gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].part == null)
+            {
+                //Set actual current part data to the last frame part data if copyToNextFrame is true
+                gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].part = currentFrame.frameParts[i].part;
+                gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].partIndex = currentFrame.frameParts[i].partIndex;
+                gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].xPos = currentFrame.frameParts[i].xPos;
+                gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].yPos = currentFrame.frameParts[i].yPos;
+                gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].flipX = currentFrame.frameParts[i].flipX;
+                gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].flipY = currentFrame.frameParts[i].flipY;
+            }
+
             GameParts[i].transform.position = new Vector3(gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].xPos, gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].yPos, -(i / 100.0f));
             GamePartsSRs[i].sprite = gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].part;
             GamePartsSRs[i].flipX = gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].flipX;
@@ -454,6 +477,11 @@ public class PixelAnimator : MonoBehaviour
         }
     }
 
+    public void CopyToNext()
+    {
+        copyToNextFrame = !copyToNextFrame;
+    }
+
     private void LoadPartData()
     {
         currentPart.part = currentGamePartSR.sprite;
@@ -461,22 +489,6 @@ public class PixelAnimator : MonoBehaviour
         currentPart.flipY = currentGamePartSR.flipY;
 
         UpdatePos();
-    }
-
-    public void SetPlaybackSpeed()
-    {
-        playbackSpeed = gameManager.ParseToSingle(GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text);
-
-        if (playbackSpeed < 0.001f)
-        {
-            Debug.Log("Playback speed cannot be lower than 0.001. Auto-set to 0.001.");
-            playbackSpeed = 0.001f;
-            GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(playbackSpeed);
-        }
-
-        playbackSpeedWFS = new WaitForSeconds(playbackSpeed);
-        gameManager.lastPlaybackSpeed = playbackSpeed;
-        gameManager.SaveGameSettings();
     }
     #endregion
 
@@ -492,6 +504,7 @@ public class PixelAnimator : MonoBehaviour
             Destroy(currentGamePart.GetComponent<PolygonCollider2D>());
         }
         currentGamePart.AddComponent<PolygonCollider2D>();
+        currentGamePartAnimator.SetBool("WasSelected", true);
 
         lastOpenedPositionDD = GameObject.Find("SpritesContent").GetComponent<RectTransform>().position.y;
     }
@@ -502,8 +515,19 @@ public class PixelAnimator : MonoBehaviour
 
         if (Convert.ToInt32(partSelect.value) < gameManager.currentAnimation.maxPartCount)
         {
+            if (currentGamePartAnimator != null)
+            {
+                currentGamePartAnimator.SetBool("WasSelected", false);
+            }
+
             currentGamePart = GameParts[Convert.ToInt32(partSelect.value)];
             currentGamePartSR = currentGamePart.GetComponent<SpriteRenderer>();
+            currentGamePartAnimator = currentGamePart.GetComponent<Animator>();
+
+            if (!playingAnimation)
+            {
+                currentGamePartAnimator.SetBool("WasSelected", true);
+            }
 
             currentPart = currentFrame.frameParts[Convert.ToInt32(partSelect.value)];
             UpdatePartSelectText();
@@ -640,6 +664,22 @@ public class PixelAnimator : MonoBehaviour
         XPosIF.text = gameManager.ParseToString((currentGamePart.transform.position.x * 16f) - (gameManager.currentAnimation.gridSizeX / 2));
     }
     #endregion
+
+    public void SetPlaybackSpeed()
+    {
+        playbackSpeed = gameManager.ParseToSingle(GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text);
+
+        if (playbackSpeed < 0.001f)
+        {
+            Debug.Log("Playback speed cannot be lower than 0.001. Auto-set to 0.001.");
+            playbackSpeed = 0.001f;
+            GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(playbackSpeed);
+        }
+
+        playbackSpeedWFS = new WaitForSeconds(playbackSpeed);
+        gameManager.lastPlaybackSpeed = playbackSpeed;
+        gameManager.SaveGameSettings();
+    }
 
     public void BackConfirmationPopup()
     {

@@ -1,6 +1,7 @@
+using System;
 using UnityEngine;
 
 public class MainMenuItem : MonoBehaviour
 {
-    [HideInInspector] public MainMenuItem previousItem;
+    [NonSerialized] public MainMenuItem previousItem;
 }

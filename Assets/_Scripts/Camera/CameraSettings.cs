@@ -60,8 +60,8 @@ public class CameraSettings : MonoBehaviour
 
     public void ResetCameraZoom()
     {
-        Camera.main.orthographicSize = 5;
-        CameraZoomIF.text = "5";
+        Camera.main.orthographicSize = 4;
+        CameraZoomIF.text = "4";
     }
 
     public void ResetCameraSpeed()

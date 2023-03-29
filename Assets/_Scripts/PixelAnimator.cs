@@ -19,12 +19,15 @@ public class PixelAnimator : MonoBehaviour
     public Part currentPart;
     //Scene stuff
     public GameObject spritePrefab;
+    public GameObject ghostPrefab;
 
     public Transform gridTransform;
     public Material gridMaterial;
 
     private List<GameObject> GameParts = new List<GameObject>();
     private List<SpriteRenderer> GamePartsSRs = new List<SpriteRenderer>();
+    private List<GameObject> GhostParts = new List<GameObject>();
+    private List<SpriteRenderer> GhostPartsSRs = new List<SpriteRenderer>();
 
     private GameObject currentGamePart;
     private SpriteRenderer currentGamePartSR;
@@ -64,6 +67,8 @@ public class PixelAnimator : MonoBehaviour
     private bool dropdownActive = false;
     private bool copyToNextFrame = true;
     private bool copyToNextFrameWasOn = false;
+    private bool ghosting = true;
+    private bool ghostingWasOn = false;
 
     private void Awake()
     {
@@ -130,6 +135,7 @@ public class PixelAnimator : MonoBehaviour
         for (int part = 0; part < gameManager.currentAnimation.maxPartCount; part++)
         {
             CreateSprite(part);
+            CreateGhostSprite(part);
         }
 
         SetValues();
@@ -324,7 +330,7 @@ public class PixelAnimator : MonoBehaviour
         }
         else
         {
-            Debug.Log("spriteGameObject is not set.");
+            Debug.Log("spritePrefab is not set.");
             SceneManager.LoadScene("MainMenu");
         }
 
@@ -334,7 +340,7 @@ public class PixelAnimator : MonoBehaviour
         SpriteRenderer gamePartSpriteRdr = gamePart.GetComponent<SpriteRenderer>();
         gamePartSpriteRdr.sortingOrder = _part + 1;
         gamePartSpriteRdr.sprite = gameManager.currentAnimation.frames[0].frameParts[_part].part;
-        gamePartSpriteRdr.transform.position = new Vector3(gameManager.currentAnimation.frames[0].frameParts[_part].xPos, gameManager.currentAnimation.frames[0].frameParts[_part].yPos, -(_part / 100.0f));
+        gamePartSpriteRdr.transform.position = new Vector3(gameManager.currentAnimation.frames[0].frameParts[_part].xPos, gameManager.currentAnimation.frames[0].frameParts[_part].yPos, 0);
         gamePartSpriteRdr.flipX = gameManager.currentAnimation.frames[0].frameParts[_part].flipX;
         gamePartSpriteRdr.flipY = gameManager.currentAnimation.frames[0].frameParts[_part].flipY;
         GamePartsSRs.Add(gamePartSpriteRdr);
@@ -343,6 +349,28 @@ public class PixelAnimator : MonoBehaviour
         {
             gamePart.AddComponent<PolygonCollider2D>();
         }
+    }
+
+    private void CreateGhostSprite(int _part)
+    {
+        GameObject ghostPart = null;
+
+        if (null != ghostPrefab)
+        {
+            ghostPart = Instantiate(ghostPrefab);
+        }
+        else
+        {
+            Debug.Log("ghostPrefab is not set.");
+            SceneManager.LoadScene("MainMenu");
+        }
+
+        ghostPart.name = "GhostSprite" + _part;
+        GhostParts.Add(ghostPart);
+
+        SpriteRenderer ghostPartSpriteRdr = ghostPart.GetComponent<SpriteRenderer>();
+        ghostPartSpriteRdr.color = new Color(0, 1, 1, 0.25f);
+        GhostPartsSRs.Add(ghostPartSpriteRdr);
     }
 
     private void SetValues()
@@ -370,6 +398,9 @@ public class PixelAnimator : MonoBehaviour
             if (copyToNextFrame) { copyToNextFrameWasOn = true; copyToNextFrame = false; }
             else { copyToNextFrameWasOn = false; }
 
+            if (ghosting) { ghostingWasOn = true; ghosting = false; }
+            else { ghostingWasOn = false; }
+
             for (int i = 0; i < GameParts.Count; i++)
             {
                 if (GameParts[i].GetComponent<PolygonCollider2D>() != null)
@@ -389,6 +420,7 @@ public class PixelAnimator : MonoBehaviour
             playingAnimation = false;
 
             if (copyToNextFrameWasOn) { copyToNextFrame = true; }
+            if (ghostingWasOn) { ghosting = true; }
 
             for (int i = 0; i < GameParts.Count; i++)
             {
@@ -420,6 +452,48 @@ public class PixelAnimator : MonoBehaviour
     #endregion
 
     #region FrameFunctions
+    public void AddFrame()
+    {
+        //For readability only
+        Animation anim = gameManager.currentAnimation;
+
+        int newMax = anim.maxFrameCount + 1;
+        newMax = Mathf.Min(Mathf.Max(newMax, 1), 999);
+        anim.maxFrameCount = newMax;
+
+        UpdateFrameSelectText();
+
+        anim.frames.Add(new Frame() { frameID = anim.maxFrameCount - 1 });
+
+        for (int allParts = 0; allParts < anim.maxPartCount; allParts++)
+        {
+            anim.frames[anim.maxFrameCount - 1].frameParts.Add(new Part() { partID = allParts });
+        }
+
+        frameSelect.maxValue = anim.maxFrameCount - 1;
+    }
+
+    public void RemoveFrame()
+    {
+        //For readability only
+        Animation anim = gameManager.currentAnimation;
+
+        if (frameSelect.value == anim.maxFrameCount - 1)
+        {
+            frameSelect.value--;
+        }
+
+        int newMax = anim.maxFrameCount - 1;
+        newMax = Mathf.Min(Mathf.Max(newMax, 1), 999);
+        anim.maxFrameCount = newMax;
+
+        UpdateFrameSelectText();
+
+        anim.frames.RemoveAt(anim.maxFrameCount);
+
+        frameSelect.maxValue = anim.maxFrameCount - 1;
+    }
+
     public void NextFrame()
     {
         frameSelect.value++;
@@ -440,6 +514,18 @@ public class PixelAnimator : MonoBehaviour
             currentFrame.frameParts[i].flipX = GamePartsSRs[i].flipX;
             currentFrame.frameParts[i].flipY = GamePartsSRs[i].flipY;
 
+            if (ghosting && !playingAnimation && frameSelect.value > currentFrame.frameID)
+            {
+                GhostParts[i].transform.position = new Vector2(currentFrame.frameParts[i].xPos, currentFrame.frameParts[i].yPos);
+                GhostPartsSRs[i].sprite = currentFrame.frameParts[i].part;
+                GhostPartsSRs[i].flipX = currentFrame.frameParts[i].flipX;
+                GhostPartsSRs[i].flipY = currentFrame.frameParts[i].flipY;
+            }
+            else
+            {
+                GhostPartsSRs[i].sprite = null;
+            }
+
             if (copyToNextFrame && frameSelect.value > currentFrame.frameID &&
                 gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].part == null)
             {
@@ -452,7 +538,7 @@ public class PixelAnimator : MonoBehaviour
                 gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].flipY = currentFrame.frameParts[i].flipY;
             }
 
-            GameParts[i].transform.position = new Vector3(gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].xPos, gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].yPos, -(i / 100.0f));
+            GameParts[i].transform.position = new Vector3(gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].xPos, gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].yPos, 0);
             GamePartsSRs[i].sprite = gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].part;
             GamePartsSRs[i].flipX = gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].flipX;
             GamePartsSRs[i].flipY = gameManager.currentAnimation.frames[Convert.ToInt32(frameSelect.value)].frameParts[i].flipY;
@@ -477,9 +563,23 @@ public class PixelAnimator : MonoBehaviour
         }
     }
 
+    public void ClearFrame()
+    {
+        for (int i = 0; i < gameManager.currentAnimation.maxPartCount; i++)
+        {
+            currentFrame.frameParts[i].part = null;
+            GamePartsSRs[i].sprite = null;
+        }
+    }
+
     public void CopyToNext()
     {
         copyToNextFrame = !copyToNextFrame;
+    }
+
+    public void Ghosting()
+    {
+        ghosting = !ghosting;
     }
 
     private void LoadPartData()
@@ -493,11 +593,78 @@ public class PixelAnimator : MonoBehaviour
     #endregion
 
     #region PartFunctions
+    public void AddPart()
+    {
+        //For readability only
+        Animation anim = gameManager.currentAnimation;
+
+        int newMax = anim.maxPartCount + 1;
+        newMax = Mathf.Min(Mathf.Max(newMax, 1), 99);
+        anim.maxPartCount = newMax;
+
+        UpdatePartSelectText();
+
+        for (int allFrames = 0; allFrames < anim.maxFrameCount; allFrames++)
+        {
+            anim.frames[allFrames].frameParts.Add(new Part() { partID = anim.maxPartCount - 1 });
+        }
+
+        GameObject newSprite = Instantiate(spritePrefab);
+        newSprite.name = "AnimSprite" + (anim.maxPartCount - 1);
+        GameParts.Add(newSprite);
+        SpriteRenderer newSpriteRenderer = newSprite.GetComponent<SpriteRenderer>();
+        newSpriteRenderer.sortingOrder = anim.maxPartCount;
+        GamePartsSRs.Add(newSpriteRenderer);
+
+        GameObject newGhost = Instantiate(ghostPrefab);
+        newGhost.name = "GhostSprite" + (anim.maxPartCount - 1);
+        GhostParts.Add(newGhost);
+        SpriteRenderer newGhostRenderer = newGhost.GetComponent<SpriteRenderer>();
+        newGhostRenderer.color = new Color(0, 1, 1, 0.25f);
+        GhostPartsSRs.Add(newGhostRenderer);
+
+        partSelect.maxValue = anim.maxPartCount - 1;
+    }
+
+    public void RemovePart()
+    {
+        //For readability only
+        Animation anim = gameManager.currentAnimation;
+
+        if (partSelect.value == anim.maxPartCount - 1)
+        {
+            partSelect.value--;
+        }
+
+        int newMax = anim.maxPartCount - 1;
+        newMax = Mathf.Min(Mathf.Max(newMax, 1), 99);
+        anim.maxPartCount = newMax;
+
+        UpdatePartSelectText();
+
+        for (int allFrames = 0; allFrames < anim.maxFrameCount; allFrames++)
+        {
+            anim.frames[allFrames].frameParts.RemoveAt(anim.maxPartCount);
+        }
+
+        GameParts.RemoveAt(anim.maxPartCount);
+        GamePartsSRs.RemoveAt(anim.maxPartCount);
+
+        GhostParts.RemoveAt(anim.maxPartCount);
+        GhostPartsSRs.RemoveAt(anim.maxPartCount);
+
+        partSelect.maxValue = anim.maxPartCount - 1;
+
+        Destroy(GameObject.Find("AnimSprite" + anim.maxPartCount));
+        Destroy(GameObject.Find("GhostSprite" + anim.maxPartCount));
+    }
+
     public void SetPartSpriteForFrame()
     {
         currentPart.part = ddSprites.options[ddSprites.value].image;
         currentPart.partIndex = ddSprites.value;
         currentGamePartSR.sprite = currentPart.part;
+
         //When setting a sprite for the gamePart, turn on the box collider
         if (currentGamePart.GetComponent<PolygonCollider2D>() != null)
         {
@@ -573,7 +740,7 @@ public class PixelAnimator : MonoBehaviour
         }
 
         currentGamePartSR.sortingOrder = priority;
-        currentGamePart.transform.position = new Vector3(currentGamePart.transform.position.x, currentGamePart.transform.position.y, -(priority / 100.0f));
+        currentGamePart.transform.position = new Vector3(currentGamePart.transform.position.x, currentGamePart.transform.position.y, 0);
         UpdatePriorityText();
     }
 

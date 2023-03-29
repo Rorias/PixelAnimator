@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 public class CameraSettings : MonoBehaviour
 {
-    [NonSerialized] public float maxCameraZoom = 15f;
+    [NonSerialized] public float maxCameraZoom = 16f;
     [NonSerialized] public float cameraSpeed = 0.2f;
 
     private TMP_InputField CameraZoomIF;

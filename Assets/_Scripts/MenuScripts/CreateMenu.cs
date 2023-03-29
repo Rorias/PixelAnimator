@@ -75,13 +75,13 @@ public class CreateMenu : MonoBehaviour
 
     public void SetGridSizeX()
     {
-        gameManager.currentAnimation.gridSizeX = Mathf.Min(Mathf.Max(Convert.ToInt32(IFXsize.text), 1), 2047);
+        gameManager.currentAnimation.gridSizeX = Mathf.Min(Mathf.Max(Convert.ToInt32(IFXsize.text), 1), 4095);
         IFXsize.text = gameManager.currentAnimation.gridSizeX.ToString();
     }
 
     public void SetGridSizeY()
     {
-        gameManager.currentAnimation.gridSizeY = Mathf.Min(Mathf.Max(Convert.ToInt32(IFYsize.text), 1), 2047);
+        gameManager.currentAnimation.gridSizeY = Mathf.Min(Mathf.Max(Convert.ToInt32(IFYsize.text), 1), 4095);
         IFYsize.text = gameManager.currentAnimation.gridSizeY.ToString();
     }
 

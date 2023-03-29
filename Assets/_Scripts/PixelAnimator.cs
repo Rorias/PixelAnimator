@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 
 using TMPro;
@@ -20,6 +22,7 @@ public class PixelAnimator : MonoBehaviour
     //Scene stuff
     public GameObject spritePrefab;
     public GameObject ghostPrefab;
+    public Camera gifCamera;
 
     public Transform gridTransform;
     public Material gridMaterial;
@@ -856,6 +859,67 @@ public class PixelAnimator : MonoBehaviour
     public void Save()
     {
         animManager.SaveFile(gameManager.currentAnimation);
+    }
+
+    public void SaveAsImageListZip()
+    {
+        //Set GIF view to real view
+        gifCamera.orthographicSize = Camera.main.orthographicSize;
+        gifCamera.transform.position = Camera.main.transform.position;
+        currentGamePartAnimator.SetBool("WasSelected", false);
+        playingAnimation = true;
+
+        StartCoroutine(CreateImageList());
+    }
+
+    private IEnumerator CreateImageList()
+    {
+        Animation anim = gameManager.currentAnimation;
+
+        string animDir = gameManager.animationsPath + "/" + anim.animationName;
+
+        if (!Directory.Exists(animDir))
+        {
+            Directory.CreateDirectory(animDir);
+        }
+
+        for (int animFrames = 0; animFrames < gameManager.currentAnimation.maxFrameCount; animFrames++)
+        {
+            frameSelect.value = animFrames;
+            yield return new WaitForEndOfFrame();
+
+            int multiplier = Mathf.CeilToInt(Camera.main.orthographicSize / 2.0f);
+
+            Debug.Log(multiplier);
+
+            RenderTexture screenTexture = new RenderTexture(anim.gridSizeX * multiplier, anim.gridSizeY * multiplier, 16);
+            gifCamera.targetTexture = screenTexture;
+            RenderTexture.active = screenTexture;
+            gifCamera.Render();
+            Texture2D renderedTexture = new Texture2D(anim.gridSizeX * multiplier, anim.gridSizeY * multiplier);
+            renderedTexture.ReadPixels(new Rect(0, 0, anim.gridSizeX * multiplier, anim.gridSizeY * multiplier), 0, 0);
+            RenderTexture.active = null;
+            gifCamera.targetTexture = null;
+            byte[] byteArray = renderedTexture.EncodeToPNG();
+            File.WriteAllBytes(animDir + "/" + anim.animationName + animFrames + ".png", byteArray);
+        }
+
+        ZipFile.CreateFromDirectory(animDir, animDir + "GIF.zip");
+        DeleteDirectory(animDir);
+
+        playingAnimation = false;
+    }
+
+    private void DeleteDirectory(string _dir)
+    {
+        string[] files = Directory.GetFiles(_dir);
+
+        foreach (string file in files)
+        {
+            File.Delete(file);
+        }
+
+        Directory.Delete(_dir);
     }
 
     public void Quit()

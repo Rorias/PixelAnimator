@@ -2,6 +2,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Linq;
 
+using UnityEngine;
 
 public sealed class AnimationManager
 {
@@ -42,6 +43,13 @@ public sealed class AnimationManager
         animation = _anim;
         SaveAnimationXMLFile(gameManager.animationsPath + "\\" + _anim.animationName);
         SaveAnimationCsFile(gameManager.animationsPath + "\\" + _anim.animationName, _anim);
+    }
+
+    private void SaveAnimationXMLFile(string _path)
+    {
+        XModel = animation.Save();
+        model = XDocument.Parse(XModel.ToString());
+        model.Save(_path + ".xml");
     }
 
     /// <summary>
@@ -86,11 +94,9 @@ public sealed class AnimationManager
         File.WriteAllText(_path + ".cs", animationInfo);
     }
 
-    private void SaveAnimationXMLFile(string _path)
+    public void SaveAnimationGifFile()
     {
-        XModel = animation.Save();
-        model = XDocument.Parse(XModel.ToString());
-        model.Save(_path + ".xml");
+        //ScreenCapture.
     }
 
     public bool LoadAnimation(Animation _a)

@@ -42,6 +42,8 @@ public class PixelAnimator : MonoBehaviour
     private TMP_InputField XPosIF;
     private TMP_InputField YPosIF;
 
+    private TMP_InputField[] allInputfields;
+
     [NonSerialized] public Slider partSelect;
     private TMP_Text partSelectText;
     private Slider frameSelect;
@@ -72,9 +74,12 @@ public class PixelAnimator : MonoBehaviour
     private bool copyToNextFrameWasOn = false;
     private bool ghosting = true;
     private bool ghostingWasOn = false;
+    private bool focussed = false;
 
     private void Awake()
     {
+        allInputfields = FindObjectsOfType<TMP_InputField>();
+
         BackConfirmation = GameObject.Find("BackConfirmation");
 
         XPosIF = GameObject.Find("XPos").GetComponent<TMP_InputField>();
@@ -184,7 +189,18 @@ public class PixelAnimator : MonoBehaviour
             dropdownActive = false;
         }
 
-        if (!dropdownActive && !playingAnimation)
+        foreach (TMP_InputField IF in allInputfields)
+        {
+            if (IF.isFocused)
+            {
+                focussed = true;
+                break;
+            }
+        }
+
+        focussed = false;
+
+        if (!focussed && !dropdownActive && !playingAnimation)
         {
             if (Input.GetKeyDown(KeyCode.Equals))
             {
@@ -841,8 +857,8 @@ public class PixelAnimator : MonoBehaviour
 
         if (playbackSpeed < 0.001f)
         {
-            Debug.Log("Playback speed cannot be lower than 0.001. Auto-set to 0.001.");
-            playbackSpeed = 0.001f;
+            Debug.Log("Playback speed cannot be lower than 0.001. Auto-set to 0.1.");
+            playbackSpeed = 0.1f;
             GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(playbackSpeed);
         }
 

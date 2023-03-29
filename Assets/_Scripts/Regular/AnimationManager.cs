@@ -2,8 +2,6 @@ using System.IO;
 using System.Text;
 using System.Xml.Linq;
 
-using UnityEngine;
-
 public sealed class AnimationManager
 {
     #region Singleton
@@ -92,11 +90,6 @@ public sealed class AnimationManager
         string animationInfo = sb.ToString();
 
         File.WriteAllText(_path + ".cs", animationInfo);
-    }
-
-    public void SaveAnimationGifFile()
-    {
-        //ScreenCapture.
     }
 
     public bool LoadAnimation(Animation _a)

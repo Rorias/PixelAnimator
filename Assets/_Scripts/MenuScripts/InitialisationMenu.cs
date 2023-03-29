@@ -64,6 +64,7 @@ public class InitialisationMenu : MonoBehaviour
             {
                 gameManager.spritesetsPath = spritesetPath;
                 ReloadSpritesetOptions(gameManager.spritesetsPath);
+                SetCurrentSpriteset();
                 gameManager.SaveGameSettings();
             }
             else
@@ -84,8 +85,8 @@ public class InitialisationMenu : MonoBehaviour
             if (Directory.Exists(spritesetPath))
             {
                 gameManager.spritesetsPath = spritesetPath;
-                gameManager.currentSpriteset = "";
                 ReloadSpritesetOptions(gameManager.spritesetsPath);
+                SetCurrentSpriteset();
                 gameManager.SaveGameSettings();
             }
             else

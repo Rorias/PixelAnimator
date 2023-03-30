@@ -24,9 +24,6 @@ public class PixelAnimator : MonoBehaviour
     public GameObject ghostPrefab;
     public Camera gifCamera;
 
-    public Transform gridTransform;
-    public Material gridMaterial;
-
     private List<GameObject> GameParts = new List<GameObject>();
     private List<SpriteRenderer> GamePartsSRs = new List<SpriteRenderer>();
     private List<GameObject> GhostParts = new List<GameObject>();
@@ -80,18 +77,19 @@ public class PixelAnimator : MonoBehaviour
     {
         allInputfields = FindObjectsOfType<TMP_InputField>();
 
-        BackConfirmation = GameObject.Find("BackConfirmation");
-
         XPosIF = GameObject.Find("XPos").GetComponent<TMP_InputField>();
         YPosIF = GameObject.Find("YPos").GetComponent<TMP_InputField>();
-
-        ddSprites = GameObject.Find("Sprites").GetComponent<TMP_Dropdown>();
 
         partSelect = GameObject.Find("PartSelect").GetComponent<Slider>();
         partSelectText = GameObject.Find("CurrentPart").GetComponent<TMP_Text>();
 
         frameSelect = GameObject.Find("FrameSelect").GetComponent<Slider>();
         frameSelectText = GameObject.Find("CurrentFrame").GetComponent<TMP_Text>();
+
+        ddSprites = GameObject.Find("Sprites").GetComponent<TMP_Dropdown>();
+
+        BackConfirmation = GameObject.Find("BackConfirmation");
+
     }
 
     private void Start()
@@ -147,7 +145,6 @@ public class PixelAnimator : MonoBehaviour
         }
 
         SetValues();
-        SetGrid();
 
         currentFrame = gameManager.currentAnimation.frames[0];
         currentPart = currentFrame.frameParts[0];
@@ -396,12 +393,6 @@ public class PixelAnimator : MonoBehaviour
     {
         partSelect.maxValue = gameManager.currentAnimation.maxPartCount - 1;
         frameSelect.maxValue = gameManager.currentAnimation.maxFrameCount - 1;
-    }
-
-    private void SetGrid()
-    {
-        gridTransform.localScale = new Vector2(gameManager.currentAnimation.gridSizeX / 16f, gameManager.currentAnimation.gridSizeY / 16f);
-        gridMaterial.mainTextureScale = new Vector2(gameManager.currentAnimation.gridSizeX / 2, gameManager.currentAnimation.gridSizeY / 2);
     }
     #endregion
 
@@ -899,31 +890,51 @@ public class PixelAnimator : MonoBehaviour
             Directory.CreateDirectory(animDir);
         }
 
+        playbackSpeed = 0.001f;
+
+        int multiplier = Mathf.CeilToInt(Camera.main.orthographicSize / 2.0f);
+
+        float xRatio = anim.gridSizeX / anim.gridSizeY;
+        float yRatio = anim.gridSizeY / anim.gridSizeX;
+
+        if (xRatio > yRatio) { yRatio = 1; }
+        if (yRatio > xRatio) { xRatio = 1; }
+
+        int xSize = (int)(64 * xRatio * multiplier);
+        int ySize = (int)(64 * yRatio * multiplier);
+
         for (int animFrames = 0; animFrames < gameManager.currentAnimation.maxFrameCount; animFrames++)
         {
             frameSelect.value = animFrames;
             yield return new WaitForEndOfFrame();
 
-            int multiplier = Mathf.CeilToInt(Camera.main.orthographicSize / 2.0f);
-
-            Debug.Log(multiplier);
-
-            RenderTexture screenTexture = new RenderTexture(anim.gridSizeX * multiplier, anim.gridSizeY * multiplier, 16);
+            RenderTexture screenTexture = new RenderTexture(xSize, ySize, 16);
             gifCamera.targetTexture = screenTexture;
             RenderTexture.active = screenTexture;
             gifCamera.Render();
-            Texture2D renderedTexture = new Texture2D(anim.gridSizeX * multiplier, anim.gridSizeY * multiplier);
-            renderedTexture.ReadPixels(new Rect(0, 0, anim.gridSizeX * multiplier, anim.gridSizeY * multiplier), 0, 0);
+            Texture2D renderedTexture = new Texture2D(xSize, ySize);
+            renderedTexture.ReadPixels(new Rect(0, 0, xSize, ySize), 0, 0);
             RenderTexture.active = null;
             gifCamera.targetTexture = null;
             byte[] byteArray = renderedTexture.EncodeToPNG();
             File.WriteAllBytes(animDir + "/" + anim.animationName + animFrames + ".png", byteArray);
         }
 
-        ZipFile.CreateFromDirectory(animDir, animDir + "GIF.zip");
+        CreateZipFile(animDir);
         DeleteDirectory(animDir);
 
+        playbackSpeed = gameManager.lastPlaybackSpeed;
         playingAnimation = false;
+    }
+
+    private void CreateZipFile(string _dir)
+    {
+        if (File.Exists(_dir + "GIF.zip"))
+        {
+            File.Delete(_dir + "GIF.zip");
+        }
+
+        ZipFile.CreateFromDirectory(_dir, _dir + "GIF.zip");
     }
 
     private void DeleteDirectory(string _dir)

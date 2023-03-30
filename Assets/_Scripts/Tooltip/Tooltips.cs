@@ -9,13 +9,14 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class TooltipSettings : MonoBehaviour
+public class Tooltips : MonoBehaviour
 {
     private List<RaycastResult> rayResults = new List<RaycastResult>();
 
-    public GameObject tooltip;
     public Toggle extendedTooltips;
+
     public RectTransform rect;
+    public Image bg;
     public TMP_Text tooltipText;
 
     private Vector2 refRes;
@@ -65,7 +66,8 @@ public class TooltipSettings : MonoBehaviour
 
     private const string CopyToNextToggle = "Having this on will save all the current sprites and their positions to the next frame.\n";
     private const string CopyToNextToggleExtended = "If there are already sprites set in the next frame, this will be ignored.\n" +
-                                              "<b>Deleting a sprite but not selecting a new one with Copy To Next still on will set the deleted sprite again.</b>";
+                                              "<b>Deleting a sprite but not selecting a new one with Copy To Next still on will set the deleted sprite again.</b>\n" +
+                                              "This is automatically turned off when playing back the animation.";
 
     private const string GhostingToggle = "Having this on will show you a transparent version of the sprites from the last frame.\n";
     private const string GhostingToggleExtended = "This is automatically turned off when playing back the animation.";
@@ -107,7 +109,7 @@ public class TooltipSettings : MonoBehaviour
     {
         if (!tooltipsOn)
         {
-            tooltip.SetActive(false);
+            DisableTooltip();
             return;
         }
 
@@ -116,11 +118,11 @@ public class TooltipSettings : MonoBehaviour
 
         if (rayResults.Count <= 0)
         {
-            tooltip.SetActive(false);
+            DisableTooltip();
             return;
         }
 
-        tooltip.SetActive(true);
+        bg.color = new Color(1, 1, 1, 0.7f);
 
         tooltipText.text = rayResults[0].gameObject.name switch
         {
@@ -157,7 +159,7 @@ public class TooltipSettings : MonoBehaviour
 
         if (tooltipText.text == "")
         {
-            tooltip.SetActive(false);
+            DisableTooltip();
             return;
         }
 
@@ -167,9 +169,15 @@ public class TooltipSettings : MonoBehaviour
 
         float tooltipsSizeX = (rect.sizeDelta.x / 2) * (Screen.width / refRes.x);
         float tooltipsSizeY = (rect.sizeDelta.y / 2) * (Screen.height / refRes.y);
-        tooltip.transform.position = new Vector3(Input.mousePosition.x - (Input.mousePosition.x > (Screen.width / 2) ? tooltipsSizeX : -tooltipsSizeX),
+        transform.position = new Vector3(Input.mousePosition.x - (Input.mousePosition.x > (Screen.width / 2) ? tooltipsSizeX : -tooltipsSizeX),
                                          Input.mousePosition.y - (Input.mousePosition.y > (Screen.height * 0.93f) ? tooltipsSizeY : -tooltipsSizeY),
                                          Input.mousePosition.z);
+    }
+
+    private void DisableTooltip()
+    {
+        bg.color = new Color(0, 0, 0, 0);
+        tooltipText.text = "";
     }
 
     public void TooltipState()

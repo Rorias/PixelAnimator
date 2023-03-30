@@ -10,8 +10,8 @@ public class CameraSettings : MonoBehaviour
     [NonSerialized] public float maxCameraZoom = 16f;
     [NonSerialized] public float cameraSpeed = 0.2f;
 
-    private TMP_InputField CameraZoomIF;
-    private TMP_InputField CameraSpeedIF;
+    private TMP_InputField cameraZoomIF;
+    private TMP_InputField cameraSpeedIF;
 
     public static event UnityAction CameraZoomed;
     public static void OnCameraZoomed() => CameraZoomed?.Invoke();
@@ -20,8 +20,8 @@ public class CameraSettings : MonoBehaviour
 
     private void Awake()
     {
-        CameraZoomIF = GameObject.Find("CameraZoom").GetComponent<TMP_InputField>();
-        CameraSpeedIF = GameObject.Find("CameraSpeed").GetComponent<TMP_InputField>();
+        cameraZoomIF = GameObject.Find("CameraZoom").GetComponent<TMP_InputField>();
+        cameraSpeedIF = GameObject.Find("CameraSpeed").GetComponent<TMP_InputField>();
 
         CameraZoomed += () => SetCameraIFValues();
     }
@@ -34,40 +34,40 @@ public class CameraSettings : MonoBehaviour
 
     private void SetCameraIFValues()
     {
-        CameraZoomIF.text = gameManager.ParseToString(Camera.main.orthographicSize);
-        CameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
+        cameraZoomIF.text = gameManager.ParseToString(Camera.main.orthographicSize);
+        cameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
     }
 
     public void SetCameraZoom()
     {
-        float zoomLevel = gameManager.ParseToSingle(CameraZoomIF.text);
+        float zoomLevel = gameManager.ParseToSingle(cameraZoomIF.text);
         zoomLevel = Mathf.Min(Mathf.Max(zoomLevel, 1), maxCameraZoom);
 
         Camera.main.orthographicSize = zoomLevel;
-        CameraZoomIF.text = gameManager.ParseToString(Camera.main.orthographicSize);
+        cameraZoomIF.text = gameManager.ParseToString(Camera.main.orthographicSize);
         Debug.Log("Succesfully changed camera zoom to " + Camera.main.orthographicSize.ToString() + ".");
     }
 
     public void SetCameraSpeed()
     {
-        float camSpeed = gameManager.ParseToSingle(CameraSpeedIF.text);
+        float camSpeed = gameManager.ParseToSingle(cameraSpeedIF.text);
         camSpeed = Mathf.Min(Mathf.Max(camSpeed, 0.025f), 5);
 
         cameraSpeed = camSpeed;
-        CameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
+        cameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
         Debug.Log("Succesfully changed camera speed to " + cameraSpeed.ToString() + ".");
     }
 
     public void ResetCameraZoom()
     {
         Camera.main.orthographicSize = 4;
-        CameraZoomIF.text = "4";
+        cameraZoomIF.text = "4";
     }
 
     public void ResetCameraSpeed()
     {
         cameraSpeed = 0.2f;
-        CameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
+        cameraSpeedIF.text = gameManager.ParseToString(cameraSpeed);
     }
 
     public void ResetCameraPosition()

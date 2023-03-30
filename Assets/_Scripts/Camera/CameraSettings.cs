@@ -7,16 +7,16 @@ using UnityEngine.Events;
 
 public class CameraSettings : MonoBehaviour
 {
-    [NonSerialized] public float maxCameraZoom = 16f;
-    [NonSerialized] public float cameraSpeed = 0.2f;
-
-    private TMP_InputField cameraZoomIF;
-    private TMP_InputField cameraSpeedIF;
-
     public static event UnityAction CameraZoomed;
     public static void OnCameraZoomed() => CameraZoomed?.Invoke();
 
+    [NonSerialized] public float maxCameraZoom = 16f;
+    [NonSerialized] public float cameraSpeed = 0.2f;
+
     private GameManager gameManager;
+
+    private TMP_InputField cameraZoomIF;
+    private TMP_InputField cameraSpeedIF;
 
     private void Awake()
     {

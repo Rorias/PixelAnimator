@@ -1,12 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Text.RegularExpressions;
 
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -92,7 +88,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < resolutions.Length; i++)
         {
-            if ((resolutions[i].height % 9 == 0) && (resolutions[i].refreshRate == 59 || resolutions[i].refreshRate == 60 || resolutions[i].refreshRate == 75))
+            if ((resolutions[i].height % 9 == 0 && resolutions[i].width % 16 == 0) && (resolutions[i].refreshRate == 59 || resolutions[i].refreshRate == 60 || resolutions[i].refreshRate == 75))
             {
                 acceptedResNumbers.Add(i);
             }

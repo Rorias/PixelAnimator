@@ -13,19 +13,19 @@ public class CreateMenu : MonoBehaviour
 
     private GameManager gameManager;
 
-    private TMP_InputField IFName;
-    private TMP_InputField IFFrames;
-    private TMP_InputField IFParts;
-    private TMP_InputField IFXsize;
-    private TMP_InputField IFYsize;
+    private TMP_InputField nameIF;
+    private TMP_InputField framesIF;
+    private TMP_InputField partsIF;
+    private TMP_InputField xSizeIF;
+    private TMP_InputField ySizeIF;
 
     private void Awake()
     {
-        IFName = GameObject.Find("NameField").GetComponent<TMP_InputField>();
-        IFFrames = GameObject.Find("FramesField").GetComponent<TMP_InputField>();
-        IFParts = GameObject.Find("PartsField").GetComponent<TMP_InputField>();
-        IFXsize = GameObject.Find("XsizeField").GetComponent<TMP_InputField>();
-        IFYsize = GameObject.Find("YsizeField").GetComponent<TMP_InputField>();
+        nameIF = GameObject.Find("NameField").GetComponent<TMP_InputField>();
+        framesIF = GameObject.Find("FramesField").GetComponent<TMP_InputField>();
+        partsIF = GameObject.Find("PartsField").GetComponent<TMP_InputField>();
+        xSizeIF = GameObject.Find("XsizeField").GetComponent<TMP_InputField>();
+        ySizeIF = GameObject.Find("YsizeField").GetComponent<TMP_InputField>();
     }
 
     private void Start()
@@ -36,11 +36,11 @@ public class CreateMenu : MonoBehaviour
     public void InitializeCreateAnimationMenu()
     {
         gameManager.currentAnimation = new Animation();
-        IFName.text = string.Empty;
-        IFFrames.text = "1";
-        IFParts.text = "7";
-        IFXsize.text = "1";
-        IFYsize.text = "1";
+        nameIF.text = string.Empty;
+        framesIF.text = "1";
+        partsIF.text = "7";
+        xSizeIF.text = "1";
+        ySizeIF.text = "1";
     }
 
     public void SetAnimationName()
@@ -50,39 +50,39 @@ public class CreateMenu : MonoBehaviour
 
     public bool CheckAnimationName()
     {
-        if (string.IsNullOrWhiteSpace(IFName.text))
+        if (string.IsNullOrWhiteSpace(nameIF.text))
         {
             Debug.Log("Please give your animation a name.");
             DebugHelper.Log("Please give your animation a name.");
             return false;
         }
 
-        gameManager.currentAnimation.animationName = IFName.text;
+        gameManager.currentAnimation.animationName = nameIF.text;
         return true;
     }
 
     public void SetMaxFrameCount()
     {
-        gameManager.currentAnimation.maxFrameCount = Mathf.Min(Mathf.Max(Convert.ToInt32(IFFrames.text), 1), 999);
-        IFFrames.text = gameManager.currentAnimation.maxFrameCount.ToString();
+        gameManager.currentAnimation.maxFrameCount = Mathf.Min(Mathf.Max(Convert.ToInt32(framesIF.text), 1), 999);
+        framesIF.text = gameManager.currentAnimation.maxFrameCount.ToString();
     }
 
     public void SetMaxPartCount()
     {
-        gameManager.currentAnimation.maxPartCount = Mathf.Min(Mathf.Max(Convert.ToInt32(IFParts.text), 1), 99);
-        IFParts.text = gameManager.currentAnimation.maxPartCount.ToString();
+        gameManager.currentAnimation.maxPartCount = Mathf.Min(Mathf.Max(Convert.ToInt32(partsIF.text), 1), 99);
+        partsIF.text = gameManager.currentAnimation.maxPartCount.ToString();
     }
 
     public void SetGridSizeX()
     {
-        gameManager.currentAnimation.gridSizeX = Mathf.Min(Mathf.Max(Convert.ToInt32(IFXsize.text), 1), 4095);
-        IFXsize.text = gameManager.currentAnimation.gridSizeX.ToString();
+        gameManager.currentAnimation.gridSizeX = Mathf.Min(Mathf.Max(Convert.ToInt32(xSizeIF.text), 1), 4095);
+        xSizeIF.text = gameManager.currentAnimation.gridSizeX.ToString();
     }
 
     public void SetGridSizeY()
     {
-        gameManager.currentAnimation.gridSizeY = Mathf.Min(Mathf.Max(Convert.ToInt32(IFYsize.text), 1), 4095);
-        IFYsize.text = gameManager.currentAnimation.gridSizeY.ToString();
+        gameManager.currentAnimation.gridSizeY = Mathf.Min(Mathf.Max(Convert.ToInt32(ySizeIF.text), 1), 4095);
+        ySizeIF.text = gameManager.currentAnimation.gridSizeY.ToString();
     }
 
     private void InitializeNewAnimation()
@@ -105,7 +105,7 @@ public class CreateMenu : MonoBehaviour
 
     public void CreateNewAnimation()
     {
-        if (File.Exists(Application.dataPath + "/StreamingAssets/" + gameManager.currentAnimation.animationName + ".xml"))
+        if (File.Exists(gameManager.animationsPath + "\\" + gameManager.currentAnimation.animationName + ".xml"))
         {
             Debug.Log("There is already an animation with this name.");
             DebugHelper.Log("There is already an animation with this name.");

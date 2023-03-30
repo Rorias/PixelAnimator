@@ -1,14 +1,10 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Xml.Linq;
 
 using TMPro;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class LoadMenu : MonoBehaviour
 {
@@ -19,13 +15,23 @@ public class LoadMenu : MonoBehaviour
 
     private List<string> loadableAnims = new List<string>();
 
-    private GameObject DeleteAnim;
-    private TMP_Dropdown ddLoadAnims;
+    private GameObject editAnimMenu;
+    private GameObject renameAnimMenu;
+    private GameObject deleteAnimMenu;
+
+    private TMP_InputField renameIF;
+    private TMP_Dropdown loadAnimsDD;
+
+    private string previousAnimName;
 
     private void Awake()
     {
-        DeleteAnim = GameObject.Find("DeleteConfirmation");
-        ddLoadAnims = GameObject.Find("LoadableAnimsDD").GetComponent<TMP_Dropdown>();
+        editAnimMenu = GameObject.Find("EditMenu");
+        renameAnimMenu = GameObject.Find("RenameMenu");
+        deleteAnimMenu = GameObject.Find("DeleteConfirmationMenu");
+
+        renameIF = GameObject.Find("Rename").GetComponent<TMP_InputField>();
+        loadAnimsDD = GameObject.Find("LoadableAnimsDD").GetComponent<TMP_Dropdown>();
     }
 
     private void Start()
@@ -36,10 +42,9 @@ public class LoadMenu : MonoBehaviour
 
     public void InitializeLoadAnimationMenu()
     {
-        if (DeleteAnim.activeSelf)
-        {
-            DeleteAnim.SetActive(false);
-        }
+        editAnimMenu.SetActive(false);
+        renameAnimMenu.SetActive(false);
+        deleteAnimMenu.SetActive(false);
 
         GetLoadableAnimations();
 
@@ -54,7 +59,7 @@ public class LoadMenu : MonoBehaviour
         InitializeDropdown();
 
         gameManager.currentAnimation = new Animation();
-        gameManager.currentAnimation.animationName = ddLoadAnims.captionText.text;
+        gameManager.currentAnimation.animationName = loadAnimsDD.captionText.text;
     }
 
     private void GetLoadableAnimations()
@@ -80,23 +85,30 @@ public class LoadMenu : MonoBehaviour
 
     private void InitializeDropdown()
     {
-        if (ddLoadAnims.options.Count > 0) { ddLoadAnims.ClearOptions(); }
+        if (loadAnimsDD.options.Count > 0) { loadAnimsDD.ClearOptions(); }
 
-        ddLoadAnims.AddOptions(loadableAnims);
+        loadAnimsDD.AddOptions(loadableAnims);
 
         for (int i = 0; i < loadableAnims.Count; i++)
         {
-            ddLoadAnims.options[i].text = loadableAnims[i];
+            loadAnimsDD.options[i].text = loadableAnims[i];
         }
     }
 
     public void GetAnimationName()
     {
-        gameManager.currentAnimation.animationName = ddLoadAnims.captionText.text;
+        gameManager.currentAnimation.animationName = loadAnimsDD.captionText.text;
     }
 
     public void LoadAnimation()
     {
+        if (loadableAnims.Count <= 0)
+        {
+            Debug.Log("No loadable animations were found. Please create a new one instead.");
+            DebugHelper.Log("No loadable animations were found. Please create a new one instead.");
+            return;
+        }
+
         if (!animManager.LoadAnimation(gameManager.currentAnimation))
         {
             return;
@@ -105,27 +117,122 @@ public class LoadMenu : MonoBehaviour
         SceneManager.LoadScene(editorSceneName);
     }
 
+    public void EditMenuState()
+    {
+        if (loadableAnims.Count <= 0)
+        {
+            return;
+        }
+
+        editAnimMenu.SetActive(!editAnimMenu.activeSelf);
+
+        if (!editAnimMenu.activeSelf)
+        {
+            renameAnimMenu.SetActive(false);
+            loadAnimsDD.interactable = true;
+        }
+
+        if (!editAnimMenu.activeSelf)
+        {
+            deleteAnimMenu.SetActive(false);
+        }
+    }
+
+    public void RenameMenuState()
+    {
+        renameAnimMenu.SetActive(!renameAnimMenu.activeSelf);
+        loadAnimsDD.interactable = !renameAnimMenu.activeSelf;
+
+        if (renameAnimMenu.activeSelf)
+        {
+            renameIF.text = gameManager.currentAnimation.animationName;
+            previousAnimName = renameIF.text;
+        }
+    }
+
+    public void RenameAnimation()
+    {
+        string newName = renameIF.text;
+
+        if (string.IsNullOrWhiteSpace(newName))
+        {
+            Debug.Log("Please give the animation a name.");
+            DebugHelper.Log("Please the your animation a name.");
+            return;
+        }
+
+        if (newName != previousAnimName && File.Exists(gameManager.animationsPath + "\\" + newName + ".xml"))
+        { 
+            Debug.Log("There is already an animation with this name.");
+            DebugHelper.Log("There is already an animation with this name.");
+            return;
+        }
+
+        if (!animManager.LoadAnimation(gameManager.currentAnimation))
+        {
+            Debug.Log("Failed to load the current animation. Try selecting a different one.");
+            DebugHelper.Log("Failed to load the current animation. Try selecting a different one.");
+            return;
+        }
+
+        gameManager.currentAnimation.animationName = newName;
+        animManager.SaveFile(gameManager.currentAnimation);
+
+        if (newName != previousAnimName)
+        {
+            //remove old file to pretend like we renamed it
+            DeleteAnimation(previousAnimName);
+        }
+        else
+        {
+            GetLoadableAnimations();
+            InitializeDropdown();
+            EditMenuState();
+        }
+    }
+
+    public void CopyAnimation()
+    {
+        string animName = gameManager.currentAnimation.animationName;
+
+        if (!animManager.LoadAnimation(gameManager.currentAnimation))
+        {
+            return;
+        }
+
+        gameManager.currentAnimation.animationName = animName + "Copy";
+        animManager.SaveFile(gameManager.currentAnimation);
+
+        GetLoadableAnimations();
+        InitializeDropdown();
+        EditMenuState();
+    }
+
     public void DeleteConfirmationPopup()
     {
-        DeleteAnim.SetActive(!DeleteAnim.activeSelf);
+        deleteAnimMenu.SetActive(!deleteAnimMenu.activeSelf);
     }
 
     public void DeleteAnimation()
     {
         string animName = gameManager.currentAnimation.animationName;
+        DeleteAnimation(animName);
+    }
 
-        File.Delete(Application.dataPath + "/StreamingAssets/" + animName + ".xml");
-        File.Delete(Application.dataPath + "/StreamingAssets/" + animName + ".cs");
+    private void DeleteAnimation(string _name)
+    {
+        File.Delete(gameManager.animationsPath + "\\" + _name + ".xml");
+        File.Delete(gameManager.animationsPath + "\\" + _name + ".cs");
 
-        if (File.Exists(Application.dataPath + "/StreamingAssets/" + animName + ".xml.meta") &&
-            File.Exists(Application.dataPath + "/StreamingAssets/" + animName + ".cs.meta"))
+        if (File.Exists(gameManager.animationsPath + "\\" + _name + ".xml.meta") &&
+            File.Exists(gameManager.animationsPath + "\\" + _name + ".cs.meta"))
         {
-            File.Delete(Application.dataPath + "/StreamingAssets/" + animName + ".xml.meta");
-            File.Delete(Application.dataPath + "/StreamingAssets/" + animName + ".cs.meta");
+            File.Delete(gameManager.animationsPath + "\\" + _name + ".xml.meta");
+            File.Delete(gameManager.animationsPath + "\\" + _name + ".cs.meta");
         }
 
         GetLoadableAnimations();
         InitializeDropdown();
-        DeleteConfirmationPopup();
+        EditMenuState();
     }
 }

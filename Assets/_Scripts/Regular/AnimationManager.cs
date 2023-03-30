@@ -94,8 +94,6 @@ public sealed class AnimationManager
 
     public bool LoadAnimation(Animation _a)
     {
-        animation = _a;
-
         if (File.Exists(gameManager.animationsPath + "\\" + _a.animationName + ".xml"))
         {
             model = XDocument.Load(gameManager.animationsPath + "\\" + _a.animationName + ".xml");
@@ -106,6 +104,7 @@ public sealed class AnimationManager
             }
         }
 
+        animation = _a;
         return true;
     }
 }

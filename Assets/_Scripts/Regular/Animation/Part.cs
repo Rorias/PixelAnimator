@@ -34,7 +34,7 @@ public class Part
         XElement xpart = new XElement(xPart);
         xpart.Add(new XAttribute("ID", partID));
 
-        if (null != part)
+        if (part != null || partIndex >= 0)
         {
             xpart.Add(new XElement(xPartIndex, partIndex));
         }

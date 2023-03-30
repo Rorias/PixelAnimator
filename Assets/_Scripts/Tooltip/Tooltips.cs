@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,6 +39,10 @@ public class Tooltips : MonoBehaviour
     private const string ExtendedTooltipsToggle = "Having this on will display useful/advanced extra information about many buttons, toggles and fields.\n";
     private const string ExtendedTooltipsExtended = "See? Like this. The more you know!";
 
+    private const string GridLOD = "Sets the grid's Level Of Detail. The higher the value, the more pixels per grid square.";
+    private const string GridX = "Sets the width of the grid. This won't be saved unless you save the animation.";
+    private const string GridY = "Sets the height of the grid. This won't be saved unless you save the animation.";
+
     private const string Play = "Press this button to start playing your animation.\nCopy To Next will be automatically turned off when you press play.\n";
     private const string PlayExtended = "No functions can be used whilst the animation is playing to prevent accidental changes during the playback.";
 
@@ -52,7 +54,7 @@ public class Tooltips : MonoBehaviour
     private const string NextFrame = "Load the next frame of the animation to edit.\n";
     private const string NextPreviousFrameExtended = "Can be especially useful for animations with 50+ frames.";
 
-    private const string ClearFrame = "Clears the current frame of all it's sprites.\n";
+    private const string ClearFrame = "Clears the current frame of all it's sprites.\n<b>You can press the delete key if you only want to delete the selected sprite.</b>\n";
     private const string ClearFrameExtended = "The positions of the sprites when they were set to none <b>don't change.</b>";
 
     private const string FrameSlider = "Select the frame of animation you want to edit.\n<b>You can also use '+' and '-' to change the current frame.</b>\n";
@@ -73,8 +75,9 @@ public class Tooltips : MonoBehaviour
     private const string GhostingToggleExtended = "This is automatically turned off when playing back the animation.";
     #endregion
     #region Part settings
-    private const string XPos = "Type the new X position of the currently selected sprite.";
-    private const string YPos = "Type the new Y position of the currently selected sprite.";
+    private const string XPos = "Type the new X position of the currently selected sprite.\n";
+    private const string YPos = "Type the new Y position of the currently selected sprite.\n";
+    private const string XYPosExtended = "<b>You can also use the arrow keys to move a part one pixel at a time.</b>";
 
     private const string FlipX = "Having this on will mirror the image horizontally for the currently selected sprite.\n";
     private const string FlipY = "Having this on will mirror the image vertically for the currently selected sprite.\n";
@@ -132,6 +135,9 @@ public class Tooltips : MonoBehaviour
             "CameraZoom" or "ZoomText" => CameraZoom,
             "CameraSpeed" or "SpeedText" => CameraSpeed,
             "ExtendedTooltipToggleBackground" => ExtendedTooltipsToggle + (extendedOn ? ExtendedTooltipsExtended : ""),
+            "GridLOD" or "GridLODInputText" => GridLOD,
+            "GridX" or "GridXInputText" => GridX,
+            "GridY" or "GridYInputText" => GridY,
             "Play" => Play + (extendedOn ? PlayExtended : ""),
             "PlaybackSpeed" or "PlaybackInputText" => PlaybackSpeed + (extendedOn ? PlaybackSpeedExtended : ""),
             //Frame settings
@@ -147,8 +153,8 @@ public class Tooltips : MonoBehaviour
             "RemovePart" => RemovePart + (extendedOn ? RemovePartExtended : ""),
             "AddPart" => AddPart + (extendedOn ? AddPartExtended : ""),
             "PartSelectBG" or "PartFill" => PartSlider + (extendedOn ? PartSliderExtended : ""),
-            "Xpos" or "XposInputText" => XPos,
-            "Ypos" or "YposInputText" => YPos,
+            "Xpos" or "XposInputText" => XPos + (extendedOn ? XYPosExtended : ""),
+            "Ypos" or "YposInputText" => YPos + (extendedOn ? XYPosExtended : ""),
             "FlipXBG" => FlipX + (extendedOn ? FlipXYExtended : ""),
             "FlipYBG" => FlipY + (extendedOn ? FlipXYExtended : ""),
             "FixX" => FixX + (extendedOn ? FixXYExtended : ""),

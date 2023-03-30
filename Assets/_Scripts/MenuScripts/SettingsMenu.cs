@@ -1,12 +1,11 @@
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 using TMPro;
 
 using UnityEngine;
-using UnityEngine.UI;
 
 public class SettingsMenu : MonoBehaviour
 {
@@ -60,7 +59,7 @@ public class SettingsMenu : MonoBehaviour
             }
             else
             {
-                Debug.Log("Spriteset path doesn't exist or has been changed.");
+                UnityEngine.Debug.Log("Spriteset path doesn't exist or has been changed.");
                 DebugHelper.Log("Spriteset path doesn't exist or has been changed.");
             }
         }
@@ -76,7 +75,7 @@ public class SettingsMenu : MonoBehaviour
             }
             else
             {
-                Debug.Log("Animations path doesn't exist or has been changed.");
+                UnityEngine.Debug.Log("Animations path doesn't exist or has been changed.");
                 DebugHelper.Log("Animations path doesn't exist or has been changed.");
             }
         }
@@ -92,7 +91,7 @@ public class SettingsMenu : MonoBehaviour
 
         foreach (Resolution res in resolutions)
         {
-            if ((res.height % 9 == 0) && (res.refreshRate == 59 || res.refreshRate == 60 || res.refreshRate == 75))
+            if ((res.height % 9 == 0 && res.width % 16 == 0) && (res.refreshRate == 59 || res.refreshRate == 60 || res.refreshRate == 75))
             {
                 resOptions.Add(res.width + "x" + res.height + " : " + res.refreshRate);
             }
@@ -117,6 +116,17 @@ public class SettingsMenu : MonoBehaviour
 
         gameManager.SaveGameSettings();
         gameManager.SetGameSettings();
+    }
+
+    public void OpenSettingsFile()
+    {
+        ProcessStartInfo startInfo = new ProcessStartInfo
+        {
+            Arguments = Application.persistentDataPath + "/pixelSettings.ini",
+            FileName = "notepad.exe",
+        };
+
+        Process.Start(startInfo);
     }
 
     #region Spriteset settings
@@ -157,16 +167,34 @@ public class SettingsMenu : MonoBehaviour
             }
             else
             {
-                Debug.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
+                UnityEngine.Debug.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
                 DebugHelper.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
                 currentSpritesetDD.ClearOptions();
             }
         }
     }
 
+    public void OpenSpritesetsFolder()
+    {
+        if (!Directory.Exists(spritesetPathIF.text))
+        {
+            DebugHelper.Log("Current path is invalid. Check if you spelled it correctly or if the folder still exists.");
+            return;
+
+        }
+
+        ProcessStartInfo startInfo = new ProcessStartInfo
+        {
+            Arguments = spritesetPathIF.text,
+            FileName = "explorer.exe",
+        };
+
+        Process.Start(startInfo);
+    }
+
     public void SetCurrentSpriteset()
     {
-        Debug.Log("setting spriteset");
+        UnityEngine.Debug.Log("setting spriteset");
         gameManager.currentSpriteset = currentSpritesetDD.options[currentSpritesetDD.value].text;
         LoadSpriteset();
         gameManager.SaveGameSettings();
@@ -307,10 +335,27 @@ public class SettingsMenu : MonoBehaviour
             }
             else
             {
-                Debug.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
+                UnityEngine.Debug.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
                 DebugHelper.Log("Path cannot be found. Check if you spelled it correctly or use the browse button instead.");
             }
         }
+    }
+
+    public void OpenAnimationsFolder()
+    {
+        if (!Directory.Exists(animationsPathIF.text))
+        {
+            DebugHelper.Log("Current path is invalid. Check if you spelled it correctly or if the folder still exists.");
+            return;
+        }
+
+        ProcessStartInfo startInfo = new ProcessStartInfo
+        {
+            Arguments = animationsPathIF.text,
+            FileName = "explorer.exe",
+        };
+
+        Process.Start(startInfo);
     }
     #endregion
 }

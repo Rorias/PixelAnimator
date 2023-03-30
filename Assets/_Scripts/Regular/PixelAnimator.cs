@@ -36,17 +36,19 @@ public class PixelAnimator : MonoBehaviour
     private Dictionary<int, Sprite> possibleSprites = new Dictionary<int, Sprite>();
 
     //Scenedata
-    private TMP_InputField XPosIF;
-    private TMP_InputField YPosIF;
+    private TMP_InputField xPosIF;
+    private TMP_InputField yPosIF;
 
     private TMP_InputField[] allInputfields;
+    private Button[] allButtons;
+    private Toggle[] allToggles;
 
     [NonSerialized] public Slider partSelect;
     private TMP_Text partSelectText;
     private Slider frameSelect;
     private TMP_Text frameSelectText;
     private TMP_Dropdown ddSprites;
-    private GameObject BackConfirmation;
+    private GameObject backConfirmation;
 
     private WaitForSeconds playbackSpeedWFS = new WaitForSeconds(0.02f);
 
@@ -76,9 +78,11 @@ public class PixelAnimator : MonoBehaviour
     private void Awake()
     {
         allInputfields = FindObjectsOfType<TMP_InputField>();
+        allButtons = FindObjectsOfType<Button>();
+        allToggles = FindObjectsOfType<Toggle>();
 
-        XPosIF = GameObject.Find("XPos").GetComponent<TMP_InputField>();
-        YPosIF = GameObject.Find("YPos").GetComponent<TMP_InputField>();
+        xPosIF = GameObject.Find("XPos").GetComponent<TMP_InputField>();
+        yPosIF = GameObject.Find("YPos").GetComponent<TMP_InputField>();
 
         partSelect = GameObject.Find("PartSelect").GetComponent<Slider>();
         partSelectText = GameObject.Find("CurrentPart").GetComponent<TMP_Text>();
@@ -88,8 +92,7 @@ public class PixelAnimator : MonoBehaviour
 
         ddSprites = GameObject.Find("Sprites").GetComponent<TMP_Dropdown>();
 
-        BackConfirmation = GameObject.Find("BackConfirmation");
-
+        backConfirmation = GameObject.Find("BackConfirmation");
     }
 
     private void Start()
@@ -157,9 +160,9 @@ public class PixelAnimator : MonoBehaviour
             Debug.Log("A different spriteset was used when making this animation. Using this one can cause the animation to look different than intended.");
         }
 
-        if (BackConfirmation.activeSelf)
+        if (backConfirmation.activeSelf)
         {
-            BackConfirmation.SetActive(false);
+            backConfirmation.SetActive(false);
         }
 
         GameObject.Find("PlaybackSpeed").GetComponent<TMP_InputField>().text = gameManager.ParseToString(gameManager.lastPlaybackSpeed);
@@ -420,6 +423,7 @@ public class PixelAnimator : MonoBehaviour
             }
 
             GameObject.Find("Play").GetComponentInChildren<TMP_Text>().text = "Stop";
+            SetButtonToggleInputfieldState(false);
 
             ddSprites.interactable = false;
 
@@ -441,10 +445,32 @@ public class PixelAnimator : MonoBehaviour
             }
 
             GameObject.Find("Play").GetComponentInChildren<TMP_Text>().text = "Play";
+            SetButtonToggleInputfieldState(true);
 
             ddSprites.interactable = true;
 
             StopAllCoroutines();
+        }
+    }
+
+    private void SetButtonToggleInputfieldState(bool _state)
+    {
+        foreach (TMP_InputField inputField in allInputfields)
+        {
+            inputField.interactable = _state;
+        }
+
+        foreach (Button button in allButtons)
+        {
+            if (button.name != "Play")
+            {
+                button.interactable = _state;
+            }
+        }
+
+        foreach (Toggle toggle in allToggles)
+        {
+            toggle.interactable = _state;
         }
     }
 
@@ -761,13 +787,13 @@ public class PixelAnimator : MonoBehaviour
 
     public void SetXPos()
     {
-        currentGamePart.transform.position = new Vector3((Convert.ToSingle(XPosIF.text) + (gameManager.currentAnimation.gridSizeX / 2)) / 16f, currentGamePart.transform.position.y, currentGamePart.transform.position.z);
+        currentGamePart.transform.position = new Vector3((Convert.ToSingle(xPosIF.text) + (gameManager.currentAnimation.gridSizeX / 2)) / 16f, currentGamePart.transform.position.y, currentGamePart.transform.position.z);
         UpdatePos();
     }
 
     public void SetYPos()
     {
-        currentGamePart.transform.position = new Vector3(currentGamePart.transform.position.x, (Convert.ToSingle(YPosIF.text) - (gameManager.currentAnimation.gridSizeY / 2)) / 16f, currentGamePart.transform.position.z);
+        currentGamePart.transform.position = new Vector3(currentGamePart.transform.position.x, (Convert.ToSingle(yPosIF.text) - (gameManager.currentAnimation.gridSizeY / 2)) / 16f, currentGamePart.transform.position.z);
         UpdatePos();
     }
 
@@ -836,9 +862,9 @@ public class PixelAnimator : MonoBehaviour
         currentPart.xPos = currentGamePart.transform.position.x;
         currentPart.yPos = currentGamePart.transform.position.y;
 
-        YPosIF.text = gameManager.ParseToString((currentGamePart.transform.position.y * 16f) + (gameManager.currentAnimation.gridSizeY / 2));
+        yPosIF.text = gameManager.ParseToString((currentGamePart.transform.position.y * 16f) + (gameManager.currentAnimation.gridSizeY / 2));
 
-        XPosIF.text = gameManager.ParseToString((currentGamePart.transform.position.x * 16f) - (gameManager.currentAnimation.gridSizeX / 2));
+        xPosIF.text = gameManager.ParseToString((currentGamePart.transform.position.x * 16f) - (gameManager.currentAnimation.gridSizeX / 2));
     }
     #endregion
 
@@ -860,7 +886,7 @@ public class PixelAnimator : MonoBehaviour
 
     public void BackConfirmationPopup()
     {
-        BackConfirmation.SetActive(!BackConfirmation.activeSelf);
+        backConfirmation.SetActive(!backConfirmation.activeSelf);
     }
 
     public void Save()

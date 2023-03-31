@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 using UnityEngine;
 
@@ -36,6 +37,9 @@ public class GameManager : MonoBehaviour
 
     private static readonly CultureInfo CultUS = new CultureInfo("en-US");
 
+    public enum Styles { Light, Dark };
+
+
     [NonSerialized] public Dictionary<int, Sprite> spritesetImages = new Dictionary<int, Sprite>();
     [HideInInspector] public IniFile ini { get; private set; }
 
@@ -52,6 +56,9 @@ public class GameManager : MonoBehaviour
     [NonSerialized] public string animationsPath = "";
 
     [NonSerialized] public float lastPlaybackSpeed = 0.0f;
+
+    [NonSerialized] public Styles editorStyle = Styles.Dark;
+    [NonSerialized] public Color bgColor;
     #endregion
 
     #region const strings
@@ -64,6 +71,9 @@ public class GameManager : MonoBehaviour
     public const string SanimationsPath = "animationsPath";
 
     public const string SlastPlaybackSpeed = "lastPlaybackSpeed";
+
+    public const string SeditorStyle = "editorStyle";
+    public const string SbgColor = "bgColor";
     #endregion
 
     private void LoadGameSettings()
@@ -77,6 +87,9 @@ public class GameManager : MonoBehaviour
         animationsPath = ini.Read(SanimationsPath, Application.dataPath + "/StreamingAssets/");
 
         lastPlaybackSpeed = ParseToSingle(ini.Read(SlastPlaybackSpeed, "0"));
+
+        editorStyle = (Styles)Enum.Parse(typeof(Styles), ini.Read(SeditorStyle, "Dark"));
+        bgColor = ColorFromString(ini.Read(SbgColor, "RGBA(0.196,0.294,0.627,1.000)"));
     }
 
     public void SetGameSettings()
@@ -88,7 +101,9 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < resolutions.Length; i++)
         {
-            if ((resolutions[i].height % 9 == 0 && resolutions[i].width % 16 == 0) && (resolutions[i].refreshRate == 59 || resolutions[i].refreshRate == 60 || resolutions[i].refreshRate == 75))
+            Debug.Log((float)resolutions[i].width / (float)resolutions[i].height);
+
+            if (resolutions[i].height % 9 == 0 && resolutions[i].width % 16 == 0 && Mathf.Approximately((float)resolutions[i].width / (float)resolutions[i].height, 1.777778f))
             {
                 acceptedResNumbers.Add(i);
             }
@@ -115,6 +130,26 @@ public class GameManager : MonoBehaviour
         ini.Write(SanimationsPath, animationsPath);
 
         ini.Write(SlastPlaybackSpeed, ParseToString(lastPlaybackSpeed));
+
+        ini.Write(SeditorStyle, editorStyle.ToString());
+        ini.Write(SbgColor, bgColor.ToString());
+    }
+
+    private Color ColorFromString(string color)
+    {
+        if (color.Length <= 0) { return Color.black; }
+
+        color = color.Substring(5, 23);
+        color = Regex.Replace(color, @"\s", "");
+        string[] colors = color.Split(',');
+        float[] colorValues = new float[4];
+
+        for (int i = 0; i < colors.Length; i++)
+        {
+            colorValues[i] = ParseToSingle(colors[i]);
+        }
+
+        return new Color(colorValues[0], colorValues[1], colorValues[2], colorValues[3]);
     }
 
     public float ParseToSingle(string parseValue)

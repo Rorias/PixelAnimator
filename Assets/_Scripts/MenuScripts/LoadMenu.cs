@@ -56,12 +56,12 @@ public class LoadMenu : MonoBehaviour
             return;
         }
 
-        InitializeDropdown();
-
         gameManager.currentAnimation = new Animation();
-        gameManager.currentAnimation.animationName = loadAnimsDD.captionText.text;
+
+        InitializeDropdown();
     }
 
+    #region Load settings
     private void GetLoadableAnimations()
     {
         string[] fileNames = Directory.GetFiles(gameManager.animationsPath, "*.xml");
@@ -93,6 +93,8 @@ public class LoadMenu : MonoBehaviour
         {
             loadAnimsDD.options[i].text = loadableAnims[i];
         }
+
+        GetAnimationName();
     }
 
     public void GetAnimationName()
@@ -116,7 +118,9 @@ public class LoadMenu : MonoBehaviour
 
         SceneManager.LoadScene(editorSceneName);
     }
+    #endregion
 
+    #region Edit settings
     public void EditMenuState()
     {
         if (loadableAnims.Count <= 0)
@@ -235,4 +239,5 @@ public class LoadMenu : MonoBehaviour
         InitializeDropdown();
         EditMenuState();
     }
+    #endregion
 }

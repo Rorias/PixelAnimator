@@ -91,7 +91,7 @@ public class SettingsMenu : MonoBehaviour
 
         foreach (Resolution res in resolutions)
         {
-            if ((res.height % 9 == 0 && res.width % 16 == 0) && (res.refreshRate == 59 || res.refreshRate == 60 || res.refreshRate == 75))
+            if (res.height % 9 == 0 && res.width % 16 == 0 && Mathf.Approximately((float)res.width / (float)res.height, 1.777778f))
             {
                 resOptions.Add(res.width + "x" + res.height + " : " + res.refreshRate);
             }

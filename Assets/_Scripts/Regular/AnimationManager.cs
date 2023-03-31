@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml.Linq;
@@ -41,6 +42,19 @@ public sealed class AnimationManager
         animation = _anim;
         SaveAnimationXMLFile(gameManager.animationsPath + "\\" + _anim.animationName);
         SaveAnimationCsFile(gameManager.animationsPath + "\\" + _anim.animationName, _anim);
+    }
+
+    public void SaveFileReversed(Animation _anim)
+    {
+        List<Frame> rFrames = new List<Frame>(_anim.frames);
+        List<Frame> nFrames = new List<Frame>(_anim.frames);
+        rFrames.Reverse();
+
+        _anim.frames = rFrames;
+        _anim.animationName = _anim.animationName + "Reversed";
+        SaveFile(_anim);
+        _anim.frames = nFrames;
+        _anim.animationName = _anim.animationName.Replace("Reversed", "");
     }
 
     private void SaveAnimationXMLFile(string _path)

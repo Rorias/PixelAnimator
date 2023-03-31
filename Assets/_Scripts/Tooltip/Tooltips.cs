@@ -24,14 +24,16 @@ public class Tooltips : MonoBehaviour
 
     #region Tooltip text
     #region Editor settings
-    private const string SaveButton = "Press this button to save your animation to a .xml and .cs file.\n";
+    private const string SaveButton = "Saves the animation to a .xml and .cs file.\n";
     private const string SaveButtonExtended = "The .xml file will be used to be able to edit the animation again later.\n" +
                                               "The .cs file can be used for any personal purposes.";
 
-    private const string GifButton = "Press this button to save your animation to a zip with images of all the frames.\n" +
+    private const string GifButton = "Saves the animation to a zip with images of all the frames.\n" +
                                      "This zip is located in the same path as the animation itself.\n";
     private const string GifButtonExtended = "The GIF images use the size of grid and the camera zoom to determine what images to create.\n" +
                                              "It is suggested to use only multiples of 2 for the camera zoom when exporting a gif.";
+
+    private const string ReverseButton = "Saves the animation with the frame order reversed to a seperate file.\n";
 
     private const string CameraZoom = "Type the zoom level of the camera.\n<b>You can also increase and decrease the zoom level using the scroll wheel.</b>";
     private const string CameraSpeed = "Type the speed you want the camera to move at.\n<b>You can move the camera using the wasd keys.</b>";
@@ -42,6 +44,8 @@ public class Tooltips : MonoBehaviour
     private const string GridLOD = "Sets the grid's Level Of Detail. The higher the value, the more pixels per grid square.";
     private const string GridX = "Sets the width of the grid. This won't be saved unless you save the animation.";
     private const string GridY = "Sets the height of the grid. This won't be saved unless you save the animation.";
+
+    private const string ResetColorButton = "Resets the background color to the default color used on editor startup.";
 
     private const string Play = "Press this button to start playing your animation.\nCopy To Next will be automatically turned off when you press play.\n";
     private const string PlayExtended = "No functions can be used whilst the animation is playing to prevent accidental changes during the playback.";
@@ -132,12 +136,14 @@ public class Tooltips : MonoBehaviour
             //Editor settings
             "SaveButton" => SaveButton + (extendedOn ? SaveButtonExtended : ""),
             "GifButton" => GifButton + (extendedOn ? GifButtonExtended : ""),
+            "ReverseButton" => ReverseButton,
             "CameraZoom" or "ZoomText" => CameraZoom,
             "CameraSpeed" or "SpeedText" => CameraSpeed,
             "ExtendedTooltipToggleBackground" => ExtendedTooltipsToggle + (extendedOn ? ExtendedTooltipsExtended : ""),
             "GridLOD" or "GridLODInputText" => GridLOD,
             "GridX" or "GridXInputText" => GridX,
             "GridY" or "GridYInputText" => GridY,
+            "ResetColorButton" => ResetColorButton,
             "Play" => Play + (extendedOn ? PlayExtended : ""),
             "PlaybackSpeed" or "PlaybackInputText" => PlaybackSpeed + (extendedOn ? PlaybackSpeedExtended : ""),
             //Frame settings

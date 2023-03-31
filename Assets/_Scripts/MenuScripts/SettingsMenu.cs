@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,6 +13,7 @@ public class SettingsMenu : MonoBehaviour
     public static readonly List<string> imageTypes = new List<string> { ".jpg", ".jpeg", ".png" };
 
     private GameManager gameManager;
+    private ThemeController themeController;
 
     //Settings UI elements
     //Personal
@@ -21,9 +23,12 @@ public class SettingsMenu : MonoBehaviour
     private TMP_InputField animationsPathIF;
     //Editor
     public TMP_Dropdown resDD;
+    private TMP_Dropdown editorThemeDD;
 
     private void Awake()
     {
+        themeController = GameObject.Find("GameManager").GetComponent<ThemeController>();
+
         spritesetPathIF = GameObject.Find("SpritesetPath").GetComponent<TMP_InputField>();
         spritesetPathIF.onValueChanged.AddListener(delegate { SetSpritesetPathViaBrowse(); });
         spritesetPathIF.onEndEdit.AddListener(delegate { SetSpritesetPath(); });
@@ -34,6 +39,9 @@ public class SettingsMenu : MonoBehaviour
         animationsPathIF = GameObject.Find("AnimationsPath").GetComponent<TMP_InputField>();
         animationsPathIF.onValueChanged.AddListener(delegate { SetAnimationsPathViaBrowse(); });
         animationsPathIF.onEndEdit.AddListener(delegate { SetAnimationsPath(); });
+
+        editorThemeDD = GameObject.Find("ThemeDD").GetComponent<TMP_Dropdown>();
+        editorThemeDD.onValueChanged.AddListener(delegate { SetEditorTheme(); });
     }
 
     private void Start()
@@ -41,11 +49,13 @@ public class SettingsMenu : MonoBehaviour
         gameManager = GameManager.Instance;
     }
 
+    #region Initialization
     public void InitializeSettingsMenu()
     {
         LoadSpritesetSettings();
         LoadAnimationsSettings();
         LoadResSettings();
+        LoadThemeSettings();
     }
 
     private void LoadSpritesetSettings()
@@ -81,7 +91,7 @@ public class SettingsMenu : MonoBehaviour
         }
     }
 
-    public void LoadResSettings()
+    private void LoadResSettings()
     {
         resDD.ClearOptions();
 
@@ -110,12 +120,35 @@ public class SettingsMenu : MonoBehaviour
         gameManager.SetGameSettings();
     }
 
+    private void LoadThemeSettings()
+    {
+        editorThemeDD.ClearOptions();
+
+        List<string> themes = new List<string>();
+
+        for (int i = 0; i < Enum.GetNames(typeof(GameManager.Themes)).Length; i++)
+        {
+            themes.Add(Enum.GetNames(typeof(GameManager.Themes))[i]);
+        }
+
+        editorThemeDD.AddOptions(themes);
+        editorThemeDD.value = (int)gameManager.editorTheme;
+    }
+
+    #endregion
     public void SetResolution()
     {
         gameManager.resNumber = resDD.value;
 
         gameManager.SaveGameSettings();
         gameManager.SetGameSettings();
+    }
+
+    public void SetEditorTheme()
+    {
+        gameManager.editorTheme = (GameManager.Themes)editorThemeDD.value;
+        gameManager.SaveGameSettings();
+        themeController.UpdateTheme();
     }
 
     public void OpenSettingsFile()

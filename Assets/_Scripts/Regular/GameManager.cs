@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
 
     private static readonly CultureInfo CultUS = new CultureInfo("en-US");
 
-    public enum Styles { Light, Dark };
+    public enum Themes { Light, Dark };
 
 
     [NonSerialized] public Dictionary<int, Sprite> spritesetImages = new Dictionary<int, Sprite>();
@@ -57,7 +57,7 @@ public class GameManager : MonoBehaviour
 
     [NonSerialized] public float lastPlaybackSpeed = 0.0f;
 
-    [NonSerialized] public Styles editorStyle = Styles.Dark;
+    [NonSerialized] public Themes editorTheme = Themes.Dark;
     [NonSerialized] public Color bgColor;
     #endregion
 
@@ -88,7 +88,7 @@ public class GameManager : MonoBehaviour
 
         lastPlaybackSpeed = ParseToSingle(ini.Read(SlastPlaybackSpeed, "0"));
 
-        editorStyle = (Styles)Enum.Parse(typeof(Styles), ini.Read(SeditorStyle, "Dark"));
+        editorTheme = (Themes)Enum.Parse(typeof(Themes), ini.Read(SeditorStyle, "Dark"));
         bgColor = ColorFromString(ini.Read(SbgColor, "RGBA(0.196,0.294,0.627,1.000)"));
     }
 
@@ -131,7 +131,7 @@ public class GameManager : MonoBehaviour
 
         ini.Write(SlastPlaybackSpeed, ParseToString(lastPlaybackSpeed));
 
-        ini.Write(SeditorStyle, editorStyle.ToString());
+        ini.Write(SeditorStyle, editorTheme.ToString());
         ini.Write(SbgColor, bgColor.ToString());
     }
 

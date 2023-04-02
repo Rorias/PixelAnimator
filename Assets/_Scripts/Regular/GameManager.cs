@@ -101,8 +101,6 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < resolutions.Length; i++)
         {
-            Debug.Log((float)resolutions[i].width / (float)resolutions[i].height);
-
             if (resolutions[i].height % 9 == 0 && resolutions[i].width % 16 == 0 && Mathf.Approximately((float)resolutions[i].width / (float)resolutions[i].height, 1.777778f))
             {
                 acceptedResNumbers.Add(i);

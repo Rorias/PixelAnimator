@@ -155,7 +155,7 @@ public class SettingsMenu : MonoBehaviour
     {
         ProcessStartInfo startInfo = new ProcessStartInfo
         {
-            Arguments = Application.persistentDataPath + "/pixelSettings.ini",
+            Arguments = Application.persistentDataPath + "/pixelSettings" + Application.version.Replace(".", "") + ".ini",
             FileName = "notepad.exe",
         };
 
@@ -173,7 +173,6 @@ public class SettingsMenu : MonoBehaviour
             {
                 gameManager.spritesetsPath = spritesetPath;
                 ReloadSpritesetOptions(gameManager.spritesetsPath);
-                SetCurrentSpriteset();
                 gameManager.SaveGameSettings();
             }
             else
@@ -195,7 +194,6 @@ public class SettingsMenu : MonoBehaviour
             {
                 gameManager.spritesetsPath = spritesetPath;
                 ReloadSpritesetOptions(gameManager.spritesetsPath);
-                SetCurrentSpriteset();
                 gameManager.SaveGameSettings();
             }
             else

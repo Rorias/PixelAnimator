@@ -18810,11 +18810,7 @@ MonoBehaviour:
     for the spritesets to be loaded from.
 
     One spriteset is a folder filled with
-    either ''.png'', ''.jpg'' or ''.jpeg'' files. All other formats will be ignored.
-
-    After
-    selecting a valid path, make sure to select the spriteset in the dropdown, even
-    if it appears like it has already picked the right one for you.'
+    either ''.png'', ''.jpg'' or ''.jpeg'' files. All other formats will be ignored.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

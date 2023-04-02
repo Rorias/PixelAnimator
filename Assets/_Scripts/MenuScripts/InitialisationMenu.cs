@@ -30,7 +30,11 @@ public class InitialisationMenu : MonoBehaviour
     {
         mainMenu = GetComponent<MainMenu>();
         gameManager = GameManager.Instance;
-        spritesetPathIF.text = gameManager.spritesetsPath;
+
+        if (gameManager.currentSpriteset == "")
+        {
+            spritesetPathIF.text = gameManager.spritesetsPath;
+        }
     }
 
     public void ApplySettings()

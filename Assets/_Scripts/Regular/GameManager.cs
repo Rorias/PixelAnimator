@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            ini = new IniFile("pixelSettings");
+            ini = new IniFile("pixelSettings" + Application.version.Replace(".",""));
 
             LoadGameSettings();
             SetGameSettings();
